@@ -1,0 +1,41 @@
+@font-face {
+  font-family: 'YekanBakh';
+  src: local('MyFont'), url(./fonts/yekan-bakh/yekan-bakh-regular.woff) format('woff');
+  font-weight: 300;
+}
+@font-face {
+  font-family: 'YekanBakh';
+  src: local('MyFont'), url(./fonts/yekan-bakh/yekan-bakh-medium.woff) format('woff');
+  font-weight: 400;
+}
+@font-face {
+  font-family: 'YekanBakh';
+  src: local('MyFont'), url(./fonts/yekan-bakh/yekan-bakh-bold.woff) format('woff');
+  font-weight: 500;
+}
+@font-face {
+  font-family: 'YekanBakh';
+  src: local('MyFont'), url(./fonts/yekan-bakh/yekan-bakh-heavy.woff) format('woff');
+  font-weight: 700;
+}
+body {
+  margin: 0;
+  font-family: 'YekanBakh', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  /* arvan theme */
+  /*direction: rtl;*/
+  background-color: rgb(247, 247, 247);
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: rgb(33, 37, 41);
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
