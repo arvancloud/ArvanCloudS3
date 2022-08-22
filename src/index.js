@@ -3,13 +3,32 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { ThemeProvider, createTheme, alpha } from '@mui/material/styles';
+
+
+import rtlPlugin from 'stylis-plugin-rtl';
+import { CacheProvider } from '@emotion/react';
+import createCache from '@emotion/cache';
+import { prefixer } from 'stylis';
+
+// Create rtl cache
+const cacheRtl = createCache({
+    key: 'muirtl',
+    stylisPlugins: [prefixer, rtlPlugin],
+});
+
+function RTL(props) {
+    return <CacheProvider value={cacheRtl}>{props.children}</CacheProvider>;
+}
+
 
 let theme = createTheme({
-    // direction: 'rtl',
+    direction: 'rtl',
     palette: {
         primary: {
             main: '#00baba',
+            light: '#e6f8f8',
+            dark: '#00a7a7',
             contrastText: '#fff'
         },
         secondary: {
@@ -25,21 +44,44 @@ let theme = createTheme({
                 disableRipple: true
             },
             styleOverrides: {
-                root: {
+                root: ({ownerState, theme}) => ({
                     fontSize: '0.87rem',
                     fontWeight: 500,
                     padding: '0.75rem 1rem',
                     height: '2.5rem',
                     borderRadius: '0.75rem',
-                    minWidth: '6rem'
-                },
+                    minWidth: '6rem',
+                    boxShadow: 'none',
+                    '&:hover': {
+                        boxShadow: `0 0 0 3px ${alpha(`${theme.palette[ownerState.color].main}`, 0.3)}`,
+
+                    },
+                    '&:active': ownerState.variant === 'contained' ? {
+                        backgroundColor: theme.palette[ownerState.color].dark,
+                        boxShadow: `0 0 0 3px ${alpha(`${theme.palette[ownerState.color].main}`, 0.3)}`,
+                    } : {}
+                }),
                 outlined: {
                     borderWidth: '2px',
-                    // '&:hover': {
-                    //     borderWidth: '2px',
-                    // }
+                    '&:hover': {
+                        borderWidth: '2px'
+                    }
                 }
             },
+        },
+        MuiDialog: {
+            styleOverrides: {
+                container:{
+                    backgroundColor: 'rgba(37,51,67,0.6)'
+                },
+                root: {
+
+                },
+                paper: {
+                    borderRadius: '1rem',
+                    boxShadow: 'none'
+                }
+            }
         },
         MuiDialogTitle: {
             styleOverrides: {
@@ -63,7 +105,11 @@ let theme = createTheme({
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-      <ThemeProvider theme={theme}><App /></ThemeProvider>
+      <ThemeProvider theme={theme}>
+          <RTL>
+              <App />
+          </RTL>
+      </ThemeProvider>
   </React.StrictMode>
 );
 

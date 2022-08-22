@@ -12,6 +12,7 @@ import BackIcon from "../../components/UI/Icons/BackIcon";
 import IconButton from "@mui/material/IconButton";
 import ObjectUploadBoxDialog from "../../dialogs/ObjectUploadBoxDialog/ObjectUploadBoxDialog";
 import BucketCreateDialog from "../../dialogs/BucketCreateDialog/BucketCreateDialog";
+import Stack from "@mui/material/Stack";
 
 const ObjectsList = () => {
 
@@ -87,13 +88,13 @@ const ObjectsList = () => {
 
     function getLastModifiedAttribute(params) {
 
-        return moment(params.row.LastModified).locale('fa').format('DD MMMM YYYY - HH:mm');
+        return moment(params.value).locale('fa').format('DD MMMM YYYY - HH:mm');
 
     }
 
     function getSizeAttribute(params) {
 
-        let size = params.row.Size;
+        let size = params.value;
 
         const sizes = ['بایت', 'کیلوبایت', 'مگابایت', 'گیگابایت', 'ترابایت']
         if (size < 1024) return `${size} بایت`;
@@ -104,7 +105,18 @@ const ObjectsList = () => {
     }
 
     const columns = [
+        {
+            field: 'RowIndex',
+            sortable: false,
+            headerName: '',
+            renderCell: (params) => {
 
+                return (
+                    <span>{params.api.getRowIndex(params.row.id) + 1}</span>
+                )
+            },
+            width: 50,
+        },
         {
             field: 'Key',
             headerName: 'نام فایل',
@@ -114,32 +126,42 @@ const ObjectsList = () => {
             //         <span onClick={handleShowObjects.bind(this, params.id)}>{params.row.Name}</span>
             //     )
             // },
-            width: 300
+
+            minWidth: 200,
+            flex: 0.8,
         },
         {
             field: 'Size',
+            type: 'number',
             headerName: 'سایز',
-            valueGetter: getSizeAttribute,
-            width: 200
+            valueFormatter: getSizeAttribute,
+            headerAlign: 'center',
+            align: 'center',
+            width: 120,
         },
         {
             field: 'LastModified',
-            valueGetter: getLastModifiedAttribute,
+            type: 'datetime',
+            valueFormatter: getLastModifiedAttribute,
             headerName: 'آخرین تغییر',
-            width: 200
+            headerAlign: 'center',
+            align: 'center',
+            width: 150
         },
         {
             field: 'Acl',
             headerName: 'نمایش عمومی',
+            type: 'boolean',
             renderCell: (params) => {
                 return (
                     <Switch/>
                 )
             },
-            width: 300
+            width: 150
         },
         {
             field: 'actions',
+            sortable: false,
             renderCell: (params) => (
                 <ActionMenu>
                     <MenuItem onClick={handleCopyBucket.bind(this, params)}>دانلود</MenuItem>
@@ -148,16 +170,22 @@ const ObjectsList = () => {
                 </ActionMenu>
             ),
             headerName: '',
-            width: 300
+            align: 'center',
+            width: 122
         }
     ];
 
     const ToolBar = (
         <div>
-            <h1>{mountedProfile.title} صندوقچه {mountedBucket}</h1>
-            <h2>لیست فایل ها</h2>
-            <IconButton onClick={handleBackToBuckets}><BackIcon fontSize="small" /></IconButton>
-            <Button onClick={() => setUploadBoxDialog({open: true})} variant="contained" startIcon={<BucketIcon />}>آپلود</Button>
+            <h3 style={{marginTop: '0'}}>{mountedProfile.title}</h3>
+            <Stack direction="row" justifyContent="space-between" sx={{marginBottom: '1rem'}}>
+                <div>
+                    <IconButton onClick={handleBackToBuckets}><BackIcon fontSize="small" /></IconButton>
+                    <span style={{fontSize: '16px', fontWeight: '700'}}>صندوقچه {mountedBucket}</span>
+                </div>
+                <Button onClick={() => setUploadBoxDialog({open: true})} variant="contained" startIcon={<BucketIcon />}>آپلود</Button>
+            </Stack>
+
             <ObjectUploadBoxDialog
                 open={uploadBoxDialog.open}
                 onClose={() => setUploadBoxDialog({open: false})}
@@ -168,7 +196,7 @@ const ObjectsList = () => {
     );
 
     return (
-        <div style={{height: 500, width: '100%'}}>
+        <div style={{width: '100%'}}>
 
             {ToolBar}
 

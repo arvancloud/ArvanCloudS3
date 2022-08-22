@@ -4,7 +4,7 @@ import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
-import TextField from "@mui/material/TextField";
+import TextField from "../../components/TextField/TextField";
 import Switch from "../../components/Switch/Switch";
 import LayoutContext from "../../contexts/LayoutContext";
 
@@ -84,7 +84,7 @@ export default function BucketCreateDialog (props) {
                 <TextField
                     error={!!validationError.Name}
                     autoFocus
-                    fullWidth={true}
+                    fullWidth
                     id="bucket-name"
                     label="نام صندوقچه"
                     type="text"
@@ -93,6 +93,7 @@ export default function BucketCreateDialog (props) {
                     helperText={validationError.Name}
                     value={inputField.Name}
                     onChange={inputsHandler}
+                    size="small"
                 />
 
                 <span>دسترسی نمایش عمومی</span>
@@ -105,7 +106,7 @@ export default function BucketCreateDialog (props) {
                 />
             </DialogContent>
             <DialogActions>
-                <Button variant="outlined" onClick={onClose}>انصراف</Button>
+                <Button color="secondary" variant="outlined" onClick={onClose}>انصراف</Button>
                 <Button variant="contained"  onClick={handleCreateBucket}>ایجاد</Button>
             </DialogActions>
         </Dialog>

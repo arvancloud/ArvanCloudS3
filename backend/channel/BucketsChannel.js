@@ -56,6 +56,7 @@ class BucketsChannel extends Channel {
     async copyBucket(sourceProfile, sourceBucketName, destProfile, destBucketName) {
 
         GlobalData.AbortSignal = false;
+        GlobalData.AppInProcess = true;
 
         const self = this;
         const sourceS3 = S3Helper.getS3(sourceProfile);
@@ -88,6 +89,7 @@ class BucketsChannel extends Channel {
             if (GlobalData.AbortSignal === true) {
 
                 self.sendTrigger('copyBucket@abort');
+                GlobalData.AppInProcess = false;
 
                 return;
             }
@@ -134,6 +136,8 @@ class BucketsChannel extends Channel {
 
                         self.sendTrigger('copyBucket@abort');
 
+                        GlobalData.AppInProcess = false;
+
                         reject();
 
 
@@ -163,6 +167,8 @@ class BucketsChannel extends Channel {
             }
 
         }
+
+        GlobalData.AppInProcess = false;
 
     }
 
