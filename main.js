@@ -2,7 +2,9 @@ global.Router = require("./backend/core/Router.js").Router;
 
 Router.resolve("core/Extended");
 
-global.GlobalData = {};
+global.GlobalData = {
+    AppInProcess: false
+};
 global.Store = Router.resolve("core/Store");
 
 const {BrowserWindow , app, ipcMain} = require('electron') // app : control application life.

@@ -12,6 +12,12 @@ import IconButton from "@mui/material/IconButton";
 import BucketCreateDialog from "../../dialogs/BucketCreateDialog/BucketCreateDialog";
 import moment from "jalali-moment";
 import BucketCopyDialog from "../../dialogs/BucketCopyDialog/BucketCopyDialog";
+import Stack from "@mui/material/Stack";
+import ListItemText from "@mui/material/ListItemText";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import DeleteIcon from '@mui/icons-material/Delete';
+import FolderCopyIcon from '@mui/icons-material/FolderCopy';
+import CloudSyncIcon from '@mui/icons-material/CloudSync';
 
 const BucketsList = () => {
 
@@ -151,11 +157,22 @@ const BucketsList = () => {
 
     function getCreationDateAttribute(params) {
 
-        return moment(params.row.CreationDate).locale('fa').format('DD MMMM YYYY - HH:mm');
+        return moment(params.value).locale('fa').format('DD MMMM YYYY - HH:mm');
     }
 
     const columns = [
+        {
+            field: 'RowIndex',
+            sortable: false,
+            headerName: '',
+            renderCell: (params) => {
 
+                return (
+                    <span>{params.api.getRowIndex(params.row.id) + 1}</span>
+                )
+            },
+            width: 50,
+        },
         {
             field: 'Name',
             headerName: 'نام صندوقچه',
@@ -165,45 +182,73 @@ const BucketsList = () => {
                     <span onClick={handleShowObjects.bind(this, params.id)}>{params.row.Name}</span>
                 )
             },
-            width: 300
+            //maxWidth: 400,
+            minWidth: 200,
+            flex: 0.8,
         },
         {
             field: 'CreationDate',
-            valueGetter: getCreationDateAttribute,
+            type: 'datetime',
+            valueFormatter: getCreationDateAttribute,
             headerName: 'تاریخ ساخت',
+            width: 150,
+            align: 'center',
             headerAlign: 'center',
-            width: 200
+
         },
         {
             field: 'Acl',
+            type: 'boolean',
             headerName: 'نمایش عمومی',
             renderCell: (params) => {
                 return (
                     <Switch/>
                 )
             },
-            width: 100
+            width: 150,
         },
         {
             field: 'actions',
+            sortable: false,
             renderCell: (params) => (
                 <ActionMenu>
-                    <MenuItem onClick={handleCopyBucket.bind(this, params)}>کپی</MenuItem>
-                    <MenuItem onClick={handleSyncBucket.bind(this, params)}>سینک</MenuItem>
-                    <MenuItem onClick={handleDeleteBucket.bind(this, params)}>حذف</MenuItem>
+                    <MenuItem onClick={handleCopyBucket.bind(this, params)}>
+                        <ListItemIcon>
+                            <FolderCopyIcon fontSize="small" />
+                        </ListItemIcon>
+                        <ListItemText>کپی</ListItemText>
+                    </MenuItem>
+                    <MenuItem onClick={handleSyncBucket.bind(this, params)}>
+                        <ListItemIcon>
+                            <CloudSyncIcon fontSize="small" />
+                        </ListItemIcon>
+                        <ListItemText>سینک</ListItemText>
+                    </MenuItem>
+                    <MenuItem onClick={handleDeleteBucket.bind(this, params)}>
+                        <ListItemIcon>
+                            <DeleteIcon fontSize="small" />
+                        </ListItemIcon>
+                        <ListItemText>حذف</ListItemText>
+                    </MenuItem>
                 </ActionMenu>
             ),
             headerName: '',
-            width: 100
+            align: 'center',
+            width: 122,
         }
     ];
 
     const ToolBar = (
         <div>
-            <h1>{mountedProfile.title}</h1>
-            <h2>لیست صندوقچه ها</h2>
-            <IconButton onClick={handleBackToProfiles}><BackIcon fontSize="small" /></IconButton>
-            <Button onClick={() => setBucketCreateDialog({open: true})} variant="contained" startIcon={<BucketIcon />}>ایجاد صندوقچه</Button>
+            <h3 style={{marginTop: '0'}}>{mountedProfile.title}</h3>
+            <Stack direction="row" justifyContent="space-between" sx={{marginBottom: '1rem'}}>
+                <div>
+                    <IconButton onClick={handleBackToProfiles}><BackIcon fontSize="small" /></IconButton>
+                    <span style={{fontSize: '16px', fontWeight: '700'}}>لیست صندوقچه ها</span>
+                </div>
+                <Button onClick={() => setBucketCreateDialog({open: true})} variant="contained" startIcon={<BucketIcon />}>ایجاد صندوقچه</Button>
+            </Stack>
+
 
             <BucketCreateDialog
                 open={bucketCreateDialog.open}
@@ -220,7 +265,7 @@ const BucketsList = () => {
     );
 
     return (
-        <div style={{height: 500, width: '100%'}}>
+        <div style={{}}>
 
             {ToolBar}
 

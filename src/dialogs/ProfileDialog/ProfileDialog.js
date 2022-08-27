@@ -4,9 +4,9 @@ import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
-import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";
 import LayoutContext from "../../contexts/LayoutContext";
+import TextField from "../../components/TextField/TextField";
 
 function ProfileDialog(props) {
 
@@ -78,7 +78,7 @@ function ProfileDialog(props) {
             <DialogContent>
                 <TextField
                     autoFocus
-                    margin="dense"
+                    size="small"
                     id="profile-title"
                     label="عنوان پروفایل"
                     type="text"
@@ -88,7 +88,7 @@ function ProfileDialog(props) {
                     onChange={handleInputs}
                 />
                 <TextField
-                    margin="dense"
+                    size="small"
                     id="profile-provider"
                     label="پرووایدر"
                     select
@@ -103,9 +103,8 @@ function ProfileDialog(props) {
                 {
                     inputField.provider === "other" ?
                         <TextField
-                            autoFocus
                             error={!!validationError.endpoint_url}
-                            margin="dense"
+                            size="small"
                             id="profile-endpoint-url"
                             label="Endpoint URL"
                             type="text"
@@ -119,9 +118,8 @@ function ProfileDialog(props) {
                 }
 
                 <TextField
-                    autoFocus
+                    size="small"
                     error={!!validationError.access_key}
-                    margin="dense"
                     id="profile-access-key"
                     label="Access Key"
                     type="text"
@@ -132,9 +130,8 @@ function ProfileDialog(props) {
                     onChange={handleInputs}
                 />
                 <TextField
-                    autoFocus
                     error={!!validationError.secret_key}
-                    margin="dense"
+                    size="small"
                     id="profile-secret-key"
                     label="Secret Key"
                     type="text"
@@ -146,7 +143,7 @@ function ProfileDialog(props) {
                 />
             </DialogContent>
             <DialogActions>
-                <Button variant="outlined" onClick={onClose}>انصراف</Button>
+                <Button color="secondary" variant="outlined" onClick={onClose}>انصراف</Button>
                 <Button
                     variant="contained"
                     disabled={

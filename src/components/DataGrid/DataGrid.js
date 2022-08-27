@@ -6,22 +6,32 @@ function DataGrid(props) {
 
     const theme = useTheme();
 
+    console.log(props);
+
     return (
         <MuiDataGrid
             {...props}
+            autoHeight={true}
+            rowHeight={67}
             disableColumnMenu={true}
             localeText={faIR.components.MuiDataGrid.defaultProps.localeText}
             rowsPerPageOptions={[25, 15, 10, 5]}
+            sortingOrder={['desc', 'asc']}
             sx={{
                 border: 0,
-                backgroundColor: 'white',
+                //backgroundColor: '#a90',
+                // "& .MuiDataGrid-virtualScroller": {
+                //     overflow: "hidden"
+                // },
+                '.MuiDataGrid-virtualScrollerContent': {
+                    paddingBottom: (props.pageSize) + 'rem'
+                },
                 '& .MuiDataGrid-row': {
-                    borderColor: 'yellow',
-                    borderStyle: 'solid',
                     border: '1px solid #000',
+                    width: `calc(100% - ${props.checkboxSelection ? '58px' : '8px'})`,
                     borderRadius: '16px',
-                    ml: '50px',
-                    mb: '8px',
+                    ml: props.checkboxSelection ? '50px' : '0',
+                    mb: '0.9rem',
                     '&:hover': {
                         backgroundColor: 'unset'
                     }
@@ -35,11 +45,11 @@ function DataGrid(props) {
                     }
                 },
 
-                '& > .MuiDataGrid-columnSeparator': {
-                    visibility: 'hidden'
+                '& .MuiDataGrid-columnSeparator': {
+                    //visibility: 'hidden'
                 },
                 '& .MuiDataGrid-cellCheckbox': {
-                    ml: '-50px'
+                    ml: props.checkboxSelection ? '-50px' : '0'
                 },
                 '& .MuiDataGrid-cell': {
                     borderBottom: 'unset',

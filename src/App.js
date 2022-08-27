@@ -12,6 +12,7 @@ import Alert from '@mui/material/Alert';
 import BucketFinderDialog from "./dialogs/BucketFinderDialog/BucketFinderDialog";
 import Container from "@mui/material/Container";
 import ConfirmDialog from "./dialogs/ConfirmDialog/ConfirmDialog";
+import Box from "@mui/material/Box";
 
 function App(){
 
@@ -72,11 +73,20 @@ function App(){
 
                 <MemoryRouter initialEntries={["/profiles"]}>
                     <Container maxWidth="lg">
-                        <Routes>
-                            <Route path={"/profiles"} element={<ProfilesList/>}/>
-                            <Route path={"/buckets"} element={<BucketsList/>}/>
-                            <Route path={"/objects"} element={<ObjectsList/>}/>
-                        </Routes>
+                        <Box sx={{
+                            backgroundColor: 'white',
+                            padding: '1.5rem',
+                            boxShadow: '0 4px 20px rgba(0,0,0, 0.03)',
+                            borderRadius: '1rem',
+                            marginTop: '1.5rem',
+                            minHeight: 'calc(91vh - 3rem)'
+                        }}>
+                            <Routes>
+                                <Route path={"/profiles"} element={<ProfilesList/>}/>
+                                <Route path={"/buckets"} element={<BucketsList/>}/>
+                                <Route path={"/objects"} element={<ObjectsList/>}/>
+                            </Routes>
+                        </Box>
                     </Container>
                 </MemoryRouter>
 

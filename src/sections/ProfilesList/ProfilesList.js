@@ -3,8 +3,12 @@ import Box from '@mui/material/Box';
 import ProfileDialog from "../../dialogs/ProfileDialog/ProfileDialog";
 import { useNavigate } from "react-router-dom";
 import LayoutContext from "../../contexts/LayoutContext";
-import ActionMenu from "../../components/ActionMenu/ActionMenu";
 import MenuItem from "@mui/material/MenuItem";
+import ProfileMenu from "../../components/ProfileMenu/ProfileMenu";
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
 
 const ProfilesList = () => {
 
@@ -20,21 +24,20 @@ const ProfilesList = () => {
     const navigate = useNavigate();
     const layout = React.useContext(LayoutContext);
 
-    const [profileDialog , setProfileDialog] = React.useState({
+    const [profileDialog, setProfileDialog] = React.useState({
         detectedProfile: profile,
         openProfileDialog: false
     });
 
     const [profiles, setProfiles] = React.useState([]);
 
-    const loadProfiles = async() => {
+    const loadProfiles = async () => {
 
-        try{
+        try {
             const rows = await window.channel("Profiles@getProfiles");
 
             setProfiles(rows);
-        }
-        catch (e) {
+        } catch (e) {
 
             console.log(e);
 
@@ -88,7 +91,7 @@ const ProfilesList = () => {
             ),
             onConfirm: async () => {
 
-                try{
+                try {
 
                     await window.channel("Profiles@deleteProfile", profile);
 
@@ -132,30 +135,63 @@ const ProfilesList = () => {
     };
 
     const sx = {
+        cursor: 'pointer',
+        position: 'relative',
+        //flex: 1,
         width: 150,
         height: 150,
         display: 'inline-block',
-        //backgroundColor: 'primary.dark',
-        backgroundColor: '#e6f8f8',
+        backgroundColor: 'primary.light',
+        borderWidth: '.125rem',
+        borderStyle: 'solid',
+        borderColor: 'primary.light',
         borderRadius: '1rem',
+        color: 'primary.main',
         '&:hover': {
+            borderColor: 'primary.main',
             //backgroundColor: 'primary.main',
-            opacity: [0.9, 0.8, 0.7],
         },
+        '.profile-menu': {
+            position: 'absolute',
+            left: 0,
+            top: 0
+        },
+        '.profile-title': {
+            display: 'inline-block',
+            marginTop: '35%',
+        }
     };
 
     return (
-        <div style={{height: 500, width: '100%'}}>
+        <div style={{
+            //minHeight: '50vh',
+            width: '100%',
+            display: "flex",
+            gap: '1rem',
+            justifyContent: "flex-start",
+            flexWrap: 'wrap',
+            alignContent: 'center'
+        }}>
 
             {
                 profiles.map((profile) => {
                     return (
                         <Box key={profile.id} sx={sx} onClick={handleShowBuckets.bind(this, profile)}>
-                            <ActionMenu>
-                                <MenuItem onClick={handleEditProfile.bind(this, profile)}>edit</MenuItem>
-                                <MenuItem onClick={handleDeleteProfile.bind(this, profile)}>delete</MenuItem>
-                            </ActionMenu>
-                            <span >{profile.title}</span>
+                            <ProfileMenu>
+                                <MenuItem disableRipple onClick={handleEditProfile.bind(this, profile)}>
+                                    <ListItemIcon>
+                                        <EditIcon fontSize="small" />
+                                    </ListItemIcon>
+                                    <ListItemText>ویرایش پروفایل</ListItemText>
+                                </MenuItem>
+                                <MenuItem disableRipple onClick={handleDeleteProfile.bind(this, profile)}>
+                                    <ListItemIcon>
+                                        <DeleteIcon fontSize="small" />
+                                    </ListItemIcon>
+                                    <ListItemText>حذف پروفایل</ListItemText>
+                                </MenuItem>
+                            </ProfileMenu>
+                            <span className="profile-title">{profile.title}</span>
                         </Box>
                     )
                 })
@@ -163,11 +199,12 @@ const ProfilesList = () => {
             <Box
                 sx={{
                     ...sx,
-                    border: '.125rem dashed #00baba'
+                    borderStyle: 'dashed',
+                    borderColor: 'primary.main',
                 }}
                 onClick={handleNewProfile}
             >
-                <span>افزودن پروفایل جدید</span>
+                <span className="profile-title">افزودن پروفایل جدید</span>
             </Box>
 
             <ProfileDialog
