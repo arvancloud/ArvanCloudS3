@@ -7,12 +7,13 @@ import LayoutContext  from './../../contexts/LayoutContext';
 import MenuItem from '@mui/material/MenuItem';
 import ActionMenu from './../../components/ActionMenu/ActionMenu';
 import Button from "@mui/material/Button";
-import BucketIcon from "../../components/UI/Icons/BucketIcon";
+import CloudUploadIcon from "../../components/UI/Icons/CloudUploadIcon";
 import BackIcon from "../../components/UI/Icons/BackIcon";
 import IconButton from "@mui/material/IconButton";
 import ObjectUploadBoxDialog from "../../dialogs/ObjectUploadBoxDialog/ObjectUploadBoxDialog";
 import BucketCreateDialog from "../../dialogs/BucketCreateDialog/BucketCreateDialog";
 import Stack from "@mui/material/Stack";
+import GoUploadDialog from "../../dialogs/GoUploadDialog/GoUploadDialog";
 
 const ObjectsList = () => {
 
@@ -26,6 +27,31 @@ const ObjectsList = () => {
     const [pageSize, setPageSize] = React.useState(5);
     const [objects, setObjects] = React.useState([]);
     const [uploadBoxDialog, setUploadBoxDialog] = React.useState({open: false});
+    const [goUploadDialog, setGoUploadDialog] = React.useState({open: false, data: {}});
+
+    const loadObjects = async() => {
+
+        try{
+            const rows = await window.channel("Objects@getObjectsPro", mountedProfile, mountedBucket);
+
+            setObjects(rows.map((item) => {
+                item.id = item.Key;
+                return item;
+            }));
+        }
+        catch (e) {
+
+            console.log(e);
+
+            layout.notify("خطا در دریافت فایل ها", {
+                severity: "error"
+            });
+
+            setObjects(null);
+
+        }
+
+    }
 
 
     console.log("ObjectsList rendered");
@@ -34,29 +60,7 @@ const ObjectsList = () => {
 
         console.log("ObjectsList mounted");
 
-        (async () => {
-
-            try{
-                const rows = await window.channel("Objects@getObjectsPro", mountedProfile, mountedBucket);
-
-                setObjects(rows.map((item) => {
-                    item.id = item.Key;
-                    return item;
-                }));
-            }
-            catch (e) {
-
-                console.log(e);
-
-                layout.notify("خطا در دریافت فایل ها", {
-                    severity: "error"
-                });
-
-                setObjects(null);
-
-            }
-
-        })();
+        loadObjects()
 
         return () => {
             console.log("ObjectsList un-mounted");
@@ -183,7 +187,7 @@ const ObjectsList = () => {
                     <IconButton onClick={handleBackToBuckets}><BackIcon fontSize="small" /></IconButton>
                     <span style={{fontSize: '16px', fontWeight: '700'}}>صندوقچه {mountedBucket}</span>
                 </div>
-                <Button onClick={() => setUploadBoxDialog({open: true})} variant="contained" startIcon={<BucketIcon />}>آپلود</Button>
+                <Button onClick={() => setUploadBoxDialog({open: true})} variant="contained" startIcon={<CloudUploadIcon />}>آپلود</Button>
             </Stack>
 
             <ObjectUploadBoxDialog
@@ -191,6 +195,16 @@ const ObjectsList = () => {
                 onClose={() => setUploadBoxDialog({open: false})}
                 mountedProfile={mountedProfile}
                 bucketName={mountedBucket}
+                prepareUpload={(data) => {setGoUploadDialog({open: true, data})}}
+            />
+
+            <GoUploadDialog
+                open={goUploadDialog.open}
+                onClose={() => setGoUploadDialog({open: false, data: {}})}
+                onFinish={loadObjects}
+                mountedProfile={mountedProfile}
+                bucketName={mountedBucket}
+                objectsData={goUploadDialog.data}
             />
         </div>
     );

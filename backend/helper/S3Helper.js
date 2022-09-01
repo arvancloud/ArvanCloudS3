@@ -193,7 +193,7 @@ module.exports.getAllObjects = async (s3, bucketName) => {
         Bucket: bucketName
     }));
 
-    let objects = data.Contents;
+    let objects = data.Contents ? data.Contents : [];
     let nextMarker = data.NextMarker;
 
     //console.log("IsTruncated", data.IsTruncated);
@@ -210,8 +210,6 @@ module.exports.getAllObjects = async (s3, bucketName) => {
         nextMarker = data.NextMarker;
 
     }
-
-    console.log("length", objects.length);
 
     return objects;
 

@@ -30,7 +30,7 @@ const BucketsList = () => {
     const [pageSize, setPageSize] = React.useState(5);
     const [buckets, setBuckets] = React.useState([]);
     const [bucketCreateDialog, setBucketCreateDialog] = React.useState({open: false});
-    const [bucketCopyDialog, setBucketCopyDialog] = React.useState({open: false, source: {}, dest: {}});
+    const [bucketCopyDialog, setBucketCopyDialog] = React.useState({open: false, source: {}, dest: {}, isSync: false});
 
     const loadBuckets = async() => {
 
@@ -87,15 +87,31 @@ const BucketsList = () => {
                 dest: {
                     bucket: bucket,
                     profile: profile
-                }
+                },
+                isSync: false
             })
         });
 
     };
 
     const handleSyncBucket = (params) => {
-        console.log(params)
-        layout.notify("سینک");
+
+        layout.bucketFinder.show((bucket, profile) => {
+
+            setBucketCopyDialog({
+                open: true,
+                source: {
+                    bucket: params.row.Name,
+                    profile: mountedProfile
+                },
+                dest: {
+                    bucket: bucket,
+                    profile: profile
+                },
+                isSync: true
+            })
+        });
+
     };
 
     const handleDeleteBucket = (params) => {
