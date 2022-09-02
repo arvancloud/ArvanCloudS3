@@ -35,7 +35,7 @@ const BucketsList = () => {
     const loadBuckets = async() => {
 
         try{
-            const rows = await window.channel("Buckets@getBuckets", mountedProfile);
+            const rows = await window.channel("Buckets@getBucketsWithAcl", mountedProfile);
 
             setBuckets(rows.map((item) => {
                 item.id = item.Name;
@@ -64,9 +64,6 @@ const BucketsList = () => {
 
         loadBuckets();
 
-        window.ipcRenderer.on('ping', (event, data) => {
-            console.log(data);
-        });
 
         return () => {
             console.log("BucketList un-mounted");
@@ -74,7 +71,7 @@ const BucketsList = () => {
 
     }, []);
 
-    const handleCopyBucket = async (params) => {
+    const handleCopyBucket = (params) => {
 
         layout.bucketFinder.show((bucket, profile) => {
 
@@ -155,6 +152,40 @@ const BucketsList = () => {
         });
     };
 
+    const handleChangeAcl = async (params, e) => {
+
+        const isPublic = e.target.checked;
+
+        try{
+
+            await window.channel("Buckets@setBucketIsPublic", mountedProfile, params.row.Name, isPublic);
+
+            const index = buckets.findIndex((bucket) => bucket.id === params.id);
+
+            buckets[index].IsPublic = isPublic;
+            setBuckets(buckets);
+
+            // const updatedBucket = { ...buckets[index], IsPublic: isPublic };
+            //
+            // setBuckets([...buckets.map((row) => (row.id === updatedBucket.id ? updatedBucket : row))]);
+
+            layout.notify("سطح دسترسی صندوقچه با موفقیت به روز شد", {
+                severity: "success"
+            });
+
+
+        }
+        catch (e) {
+
+            console.log(e);
+
+            layout.notify("خطا در تغییر سطح دسترسی صندوقچه", {
+                severity: "error"
+            });
+        }
+
+    };
+
     const handleShowObjects = (bucket) => {
 
         navigate("/objects", {
@@ -213,12 +244,12 @@ const BucketsList = () => {
 
         },
         {
-            field: 'Acl',
+            field: 'IsPublic',
             type: 'boolean',
             headerName: 'نمایش عمومی',
             renderCell: (params) => {
                 return (
-                    <Switch/>
+                    <Switch checked={params.row.IsPublic} onChange={handleChangeAcl.bind(this, params)} />
                 )
             },
             width: 150,

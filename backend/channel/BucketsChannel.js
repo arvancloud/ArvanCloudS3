@@ -1,5 +1,5 @@
 const Channel = Router.resolve('core/Channel');
-const {ListBucketsCommand, CreateBucketCommand, DeleteBucketCommand} = require('@aws-sdk/client-s3');
+const {ListBucketsCommand, CreateBucketCommand, DeleteBucketCommand, PutBucketAclCommand} = require('@aws-sdk/client-s3');
 const S3Helper = Router.resolve('helper/S3Helper');
 const fs = require("fs-extra");
 
@@ -12,6 +12,22 @@ class BucketsChannel extends Channel {
         const response = await s3.send(new ListBucketsCommand({}));
 
         return response.Buckets;
+    }
+
+    async getBucketsWithAcl(profile) {
+
+        const s3 = S3Helper.getS3(profile);
+
+        const response = await s3.send(new ListBucketsCommand({}));
+
+        return await Promise.all(response.Buckets.map(async (bucket) => {
+
+            bucket.IsPublic = await S3Helper.isPublicBucket(s3, bucket.Name);
+
+            return bucket;
+
+        }));
+
     }
 
     async createBucket(profile, bucketName, acl) {
@@ -38,6 +54,19 @@ class BucketsChannel extends Channel {
         const s3 = S3Helper.getS3(profile);
 
         await s3.send(new DeleteBucketCommand({Bucket: bucketName}));
+
+    }
+
+    async setBucketIsPublic(profile, bucketName, isPublic){
+
+        const s3 = S3Helper.getS3(profile);
+
+        const response = await s3.send(
+            new PutBucketAclCommand({
+                Bucket: bucketName,
+                ACL: isPublic ? 'public-read' : 'private',
+            })
+        );
 
     }
 

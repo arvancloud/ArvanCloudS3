@@ -7,7 +7,8 @@ const {
     UploadPartCommand,
     ListObjectsCommand,
     GetObjectCommand,
-    GetObjectAclCommand
+    GetObjectAclCommand,
+    GetBucketAclCommand,
 } = require('@aws-sdk/client-s3');
 
 const fs = require('fs-extra');
@@ -250,6 +251,18 @@ module.exports.isPublicObject = async (s3, bucketName, objectKey) => {
         new GetObjectAclCommand({
             Bucket: bucketName,
             Key: objectKey
+        })
+    );
+
+    return response.Grants[0] ? response.Grants[0].Permission === "READ" : false;
+
+};
+
+module.exports.isPublicBucket = async (s3, bucketName) => {
+
+    const response = await s3.send(
+        new GetBucketAclCommand({
+            Bucket: bucketName
         })
     );
 

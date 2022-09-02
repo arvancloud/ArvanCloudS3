@@ -23,8 +23,6 @@ export default function GoUploadDialog (props) {
         objectPercent: 0
     });
 
-    console.log(progress);
-
     const [processing, setProcessing] = React.useState(false);
     const [finish, setFinish] = React.useState(false);
 
