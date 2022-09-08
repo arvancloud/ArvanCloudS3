@@ -1,14 +1,17 @@
 import React from "react";
-import Box from '@mui/material/Box';
 import ProfileDialog from "../../dialogs/ProfileDialog/ProfileDialog";
 import { useNavigate } from "react-router-dom";
 import LayoutContext from "../../contexts/LayoutContext";
 import MenuItem from "@mui/material/MenuItem";
-import ProfileMenu from "../../components/ProfileMenu/ProfileMenu";
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
+import DataGrid from "../../components/DataGrid/DataGrid";
+import ActionMenu from "../../components/ActionMenu/ActionMenu";
+import Stack from "@mui/material/Stack";
+import CloudIcon from '@mui/icons-material/Cloud';
+import Button from "@mui/material/Button";
 
 const ProfilesList = () => {
 
@@ -31,13 +34,19 @@ const ProfilesList = () => {
 
     const [profiles, setProfiles] = React.useState([]);
 
+    const [pageSize, setPageSize] = React.useState(5);
+
+
     const loadProfiles = async () => {
 
         try {
             const rows = await window.channel("Profiles@getProfiles");
 
             setProfiles(rows);
-        } catch (e) {
+
+            return rows;
+        }
+        catch (e) {
 
             console.log(e);
 
@@ -46,6 +55,8 @@ const ProfilesList = () => {
             });
 
             setProfiles([]);
+
+            return [];
 
         }
 
@@ -57,7 +68,12 @@ const ProfilesList = () => {
 
         console.log("ProfilesList mounted");
 
-        loadProfiles();
+        loadProfiles().then((data) => {
+
+            if(data.length === 0){
+                handleNewProfile();
+            }
+        });
 
         return () => {
             console.log("ProfilesList un-mounted");
@@ -73,7 +89,7 @@ const ProfilesList = () => {
     };
 
     const handleEditProfile = (profile, event) => {
-        event.stopPropagation();
+
         setProfileDialog({
             openProfileDialog: true,
             detectedProfile: profile
@@ -81,7 +97,7 @@ const ProfilesList = () => {
     }
 
     const handleDeleteProfile = (profile, event) => {
-        event.stopPropagation();
+
         layout.confirm({
             title: "حذف پروفایل",
             content: (
@@ -134,78 +150,73 @@ const ProfilesList = () => {
         });
     };
 
-    const sx = {
-        cursor: 'pointer',
-        position: 'relative',
-        //flex: 1,
-        width: 150,
-        height: 150,
-        display: 'inline-block',
-        backgroundColor: 'primary.light',
-        borderWidth: '.125rem',
-        borderStyle: 'solid',
-        borderColor: 'primary.light',
-        borderRadius: '1rem',
-        color: 'primary.main',
-        '&:hover': {
-            borderColor: 'primary.main',
-            //backgroundColor: 'primary.main',
+
+    const columns = [
+        {
+            field: 'RowIndex',
+            sortable: false,
+            headerName: '',
+            renderCell: (params) => {
+
+                return (
+                    <span>{params.api.getRowIndex(params.row.id) + 1}</span>
+                )
+            },
+            width: 50,
         },
-        '.profile-menu': {
-            position: 'absolute',
-            left: 0,
-            top: 0
+        {
+            field: 'title',
+            headerName: 'عنوان پروفایل',
+            renderCell: (params) => {
+
+                return (
+                    <span onClick={handleShowBuckets.bind(this, params.row)}>{params.row.title}</span>
+                )
+            },
+            width: 200
         },
-        '.profile-title': {
-            display: 'inline-block',
-            marginTop: '35%',
+        {
+            field: 'endpoint_url',
+            headerName: 'نقطه اتصال',
+            minWidth: 200,
+            flex: 0.8,
+            align: 'center',
+            headerAlign: 'center',
+        },
+        {
+            field: 'actions',
+            sortable: false,
+            renderCell: (params) => (
+                <ActionMenu>
+                    <MenuItem disableRipple onClick={handleEditProfile.bind(this, params.row)}>
+                        <ListItemIcon>
+                            <EditIcon fontSize="small" />
+                        </ListItemIcon>
+                        <ListItemText>ویرایش پروفایل</ListItemText>
+                    </MenuItem>
+                    <MenuItem disableRipple onClick={handleDeleteProfile.bind(this, params.row)}>
+                        <ListItemIcon>
+                            <DeleteIcon fontSize="small" />
+                        </ListItemIcon>
+                        <ListItemText>حذف پروفایل</ListItemText>
+                    </MenuItem>
+                </ActionMenu>
+            ),
+            headerName: '',
+            align: 'center',
+            width: 122,
         }
-    };
+    ];
 
-    return (
-        <div style={{
-            //minHeight: '50vh',
-            width: '100%',
-            display: "flex",
-            gap: '1rem',
-            justifyContent: "flex-start",
-            flexWrap: 'wrap',
-            alignContent: 'center'
-        }}>
-
-            {
-                profiles.map((profile) => {
-                    return (
-                        <Box key={profile.id} sx={sx} onClick={handleShowBuckets.bind(this, profile)}>
-                            <ProfileMenu>
-                                <MenuItem disableRipple onClick={handleEditProfile.bind(this, profile)}>
-                                    <ListItemIcon>
-                                        <EditIcon fontSize="small" />
-                                    </ListItemIcon>
-                                    <ListItemText>ویرایش پروفایل</ListItemText>
-                                </MenuItem>
-                                <MenuItem disableRipple onClick={handleDeleteProfile.bind(this, profile)}>
-                                    <ListItemIcon>
-                                        <DeleteIcon fontSize="small" />
-                                    </ListItemIcon>
-                                    <ListItemText>حذف پروفایل</ListItemText>
-                                </MenuItem>
-                            </ProfileMenu>
-                            <span className="profile-title">{profile.title}</span>
-                        </Box>
-                    )
-                })
-            }
-            <Box
-                sx={{
-                    ...sx,
-                    borderStyle: 'dashed',
-                    borderColor: 'primary.main',
-                }}
-                onClick={handleNewProfile}
-            >
-                <span className="profile-title">افزودن پروفایل جدید</span>
-            </Box>
+    const ToolBar = (
+        <div>
+            <h3 style={{marginTop: '0'}}>Arvan S3</h3>
+            <Stack direction="row" justifyContent="space-between" sx={{marginBottom: '1rem'}}>
+                <div>
+                    <span style={{fontSize: '16px', fontWeight: '700'}}>لیست پروفایل ها</span>
+                </div>
+                <Button onClick={handleNewProfile} variant="contained" startIcon={<CloudIcon />}>ایجاد پروفایل</Button>
+            </Stack>
 
             <ProfileDialog
                 open={profileDialog.openProfileDialog}
@@ -213,6 +224,24 @@ const ProfilesList = () => {
                 onClose={handleCloseProfileDialog}
             />
 
+        </div>
+    );
+
+
+    return (
+        <div style={{}}>
+
+            {ToolBar}
+
+            {profiles !== null &&
+            <DataGrid
+                pageSize={pageSize}
+                disableSelectionOnClick={true}
+                onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+                columns={columns}
+                rows={profiles}
+            />
+            }
         </div>
     );
 }
