@@ -11,9 +11,15 @@ import CloudUploadIcon from "../../components/UI/Icons/CloudUploadIcon";
 import BackIcon from "../../components/UI/Icons/BackIcon";
 import IconButton from "@mui/material/IconButton";
 import ObjectUploadBoxDialog from "../../dialogs/ObjectUploadBoxDialog/ObjectUploadBoxDialog";
-import BucketCreateDialog from "../../dialogs/BucketCreateDialog/BucketCreateDialog";
 import Stack from "@mui/material/Stack";
 import GoUploadDialog from "../../dialogs/GoUploadDialog/GoUploadDialog";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from "@mui/icons-material/Delete";
+import CloudDownloadOutlinedIcon from '@mui/icons-material/CloudDownloadOutlined';
+import PublicIcon from '@mui/icons-material/Public';
+import PublicOffIcon from '@mui/icons-material/PublicOff';
 
 const ObjectsList = () => {
 
@@ -24,20 +30,35 @@ const ObjectsList = () => {
     const mountedProfile = location.state.mountedProfile;
     const mountedBucket = location.state.mountedBucket;
 
+    const [rowCount, setRowCount] = React.useState(0);
     const [pageSize, setPageSize] = React.useState(5);
+    const [page, setPage] = React.useState(0);
+    const [loading, setLoading] = React.useState(false);
     const [objects, setObjects] = React.useState([]);
     const [uploadBoxDialog, setUploadBoxDialog] = React.useState({open: false});
     const [goUploadDialog, setGoUploadDialog] = React.useState({open: false, data: {}});
+    const [selectionModel, setSelectionModel] = React.useState([]);
+
+    const queryOptions = React.useMemo(
+        () => ({
+            page,
+            pageSize,
+        }),
+        [page, pageSize],
+    );
+
+    console.log(queryOptions);
 
     const loadObjects = async() => {
 
-        try{
-            const rows = await window.channel("Objects@getObjectsPro", mountedProfile, mountedBucket);
+        setLoading(true);
 
-            setObjects(rows.map((item) => {
-                item.id = item.Key;
-                return item;
-            }));
+        try{
+            const data = await window.channel("Objects@getObjectsPro", mountedProfile, mountedBucket, queryOptions);
+
+            setRowCount(data.count);
+
+            await setObjects(data.objects);
         }
         catch (e) {
 
@@ -47,18 +68,17 @@ const ObjectsList = () => {
                 severity: "error"
             });
 
-            setObjects(null);
+            setObjects([]);
 
         }
 
+        setLoading(false);
+
     }
-
-
-    console.log("ObjectsList rendered");
 
     React.useEffect(() => {
 
-        console.log("ObjectsList mounted");
+        console.log("change query");
 
         loadObjects()
 
@@ -66,29 +86,200 @@ const ObjectsList = () => {
             console.log("ObjectsList un-mounted");
         }
 
-    }, []);
+    }, [queryOptions]);
 
-    const handleCopyBucket = async (params) => {
+    const handleDownloadObject = async (params) => {
 
-        layout.bucketFinder.show(() => {
-            alert(70);
+        layout.loading.show();
+
+        try {
+            const data = await window.channel("Objects@downloadObject", mountedProfile, mountedBucket, params.row.Key);
+
+            if(data){
+                layout.notify("دانلود فایل با موفقیت انجام شد", {
+                    severity: "success"
+                });
+            }
+
+        }
+        catch (e) {
+            console.log(e);
+
+            layout.notify("خطا در دانلود فایل", {
+                severity: "error"
+            });
+        }
+
+        layout.loading.hide();
+
+    };
+
+    const handleRenameObject = (params) => {
+
+    };
+
+    const handleDeleteObject = (params) => {
+
+        layout.confirm({
+            title: "حذف فایل",
+            content: (<>
+                <h3>فایل {params.row.Key} حذف شود؟</h3>
+                <p>این فایل برای همیشه از صندوقچه {mountedBucket} حذف می شود.</p>
+            </>),
+            onConfirm: async () => {
+
+                try{
+
+                    await window.channel("Objects@deleteObject", mountedProfile, mountedBucket, params.row.Key);
+
+                    layout.notify("فایل مورد نظر با موفقیت حذف شد", {
+                        severity: "success"
+                    });
+
+                    loadObjects()
+
+                }
+                catch (e) {
+
+                    console.log(e);
+
+                    layout.notify("خطا در حذف فایل", {
+                        severity: "error"
+                    });
+                }
+            }
         });
-        console.log(params);
-        layout.notify("کپی");
     };
 
-    const handleSyncBucket = (params) => {
-        console.log(params)
-        layout.notify("سینک");
-    };
+    const handleChangeAcl = async (params, e) => {
 
-    const handleDeleteBucket = (params) => {
-        console.log(params)
-        layout.notify("حذف");
-    };
+        const isPublic = e.target.checked;
 
+        try{
+
+            await window.channel("Objects@setObjectIsPublic", mountedProfile, mountedBucket, params.row.Key, isPublic);
+
+            const index = objects.findIndex((object) => object.id === params.id);
+
+            objects[index].IsPublic = isPublic;
+            setObjects(objects);
+
+            layout.notify("سطح دسترسی فایل با موفقیت به روز شد", {
+                severity: "success"
+            });
+
+
+        }
+        catch (e) {
+
+            console.log(e);
+
+            layout.notify("خطا در تغییر سطح دسترسی فایل", {
+                severity: "error"
+            });
+        }
+
+    };
 
     const handleBackToBuckets = () => navigate("/buckets", {replace: true, state: {mountedProfile}});
+
+
+    const handleBulkDownloadObjects = async () => {
+
+        layout.loading.show();
+
+        try {
+            const data = await window.channel("Objects@downloadObjects", mountedProfile, mountedBucket, selectionModel);
+
+            if(data){
+                layout.notify("دانلود فایل ها با موفقیت انجام شد", {
+                    severity: "success"
+                });
+            }
+
+        }
+        catch (e) {
+            console.log(e);
+
+            layout.notify("خطا در دانلود فایل ها", {
+                severity: "error"
+            });
+        }
+
+        layout.loading.hide();
+
+
+    };
+
+    const handleBulkSetPublic = async () => {
+
+        try {
+
+            await window.channel("Objects@setObjectsAcl", mountedProfile, mountedBucket, selectionModel, true);
+
+            loadObjects();
+        }
+        catch (e) {
+            console.log(e);
+
+            layout.notify("خطا در تغییر سطح دسترسی", {
+                severity: "error"
+            });
+        }
+
+    };
+
+    const handleBulkSetPrivate = async () => {
+
+        try {
+
+            await window.channel("Objects@setObjectsAcl", mountedProfile, mountedBucket, selectionModel, false);
+
+            loadObjects();
+        }
+        catch (e) {
+            console.log(e);
+
+            layout.notify("خطا در تغییر سطح دسترسی", {
+                severity: "error"
+            });
+        }
+    };
+
+    const handleBulkDeleteObjects = async () => {
+
+        layout.confirm({
+            title: "حذف فایل ها",
+            content: (<>
+                <h3>{selectionModel.length} فایل انتخاب شده حذف شود؟</h3>
+                <p>فایل ها برای همیشه از صندوقچه {mountedBucket} حذف می شود.</p>
+            </>),
+            onConfirm: async () => {
+
+                try{
+
+                    await window.channel("Objects@deleteObjects", mountedProfile, mountedBucket, selectionModel);
+
+                    layout.notify("فایل های مورد نظر با موفقیت حذف شد", {
+                        severity: "success"
+                    });
+
+                    loadObjects()
+
+                }
+                catch (e) {
+
+                    console.log(e);
+
+                    layout.notify("خطا در حذف فایل ها", {
+                        severity: "error"
+                    });
+                }
+            }
+        });
+
+    };
+
 
     function getLastModifiedAttribute(params) {
 
@@ -116,7 +307,7 @@ const ObjectsList = () => {
             renderCell: (params) => {
 
                 return (
-                    <span>{params.api.getRowIndex(params.row.id) + 1}</span>
+                    <span>{page * pageSize + params.api.getRowIndex(params.row.id) + 1}</span>
                 )
             },
             width: 50,
@@ -153,12 +344,13 @@ const ObjectsList = () => {
             width: 150
         },
         {
-            field: 'Acl',
+            field: 'IsPublic',
+            sortable: false,
             headerName: 'نمایش عمومی',
             type: 'boolean',
             renderCell: (params) => {
                 return (
-                    <Switch/>
+                    <Switch checked={params.row.IsPublic} onChange={handleChangeAcl.bind(this, params)} />
                 )
             },
             width: 150
@@ -168,9 +360,24 @@ const ObjectsList = () => {
             sortable: false,
             renderCell: (params) => (
                 <ActionMenu>
-                    <MenuItem onClick={handleCopyBucket.bind(this, params)}>دانلود</MenuItem>
-                    <MenuItem onClick={handleSyncBucket.bind(this, params)}>تغییر نام</MenuItem>
-                    <MenuItem onClick={handleDeleteBucket.bind(this, params)}>حذف</MenuItem>
+                    <MenuItem onClick={handleDownloadObject.bind(this, params)}>
+                        <ListItemIcon>
+                            <CloudDownloadOutlinedIcon fontSize="small" />
+                        </ListItemIcon>
+                        <ListItemText>دانلود</ListItemText>
+                    </MenuItem>
+                    <MenuItem onClick={handleRenameObject.bind(this, params)}>
+                        <ListItemIcon>
+                            <EditIcon fontSize="small" />
+                        </ListItemIcon>
+                        <ListItemText>تغییر نام</ListItemText>
+                    </MenuItem>
+                    <MenuItem onClick={handleDeleteObject.bind(this, params)}>
+                        <ListItemIcon>
+                            <DeleteIcon fontSize="small" />
+                        </ListItemIcon>
+                        <ListItemText>حذف</ListItemText>
+                    </MenuItem>
                 </ActionMenu>
             ),
             headerName: '',
@@ -187,6 +394,32 @@ const ObjectsList = () => {
                     <IconButton onClick={handleBackToBuckets}><BackIcon fontSize="small" /></IconButton>
                     <span style={{fontSize: '16px', fontWeight: '700'}}>صندوقچه {mountedBucket}</span>
                 </div>
+                <ActionMenu buttonTitle="عملیات گروهی" disabled={!selectionModel.length}>
+                    <MenuItem onClick={handleBulkDownloadObjects}>
+                        <ListItemIcon>
+                            <CloudDownloadOutlinedIcon fontSize="small" />
+                        </ListItemIcon>
+                        <ListItemText>دانلود</ListItemText>
+                    </MenuItem>
+                    <MenuItem onClick={handleBulkSetPublic}>
+                        <ListItemIcon>
+                            <PublicIcon fontSize="small" />
+                        </ListItemIcon>
+                        <ListItemText>دسترسی نمایش عمومی</ListItemText>
+                    </MenuItem>
+                    <MenuItem onClick={handleBulkSetPrivate}>
+                        <ListItemIcon>
+                            <PublicOffIcon fontSize="small" />
+                        </ListItemIcon>
+                        <ListItemText>عدم نمایش عمومی</ListItemText>
+                    </MenuItem>
+                    <MenuItem onClick={handleBulkDeleteObjects}>
+                        <ListItemIcon>
+                            <DeleteIcon fontSize="small" />
+                        </ListItemIcon>
+                        <ListItemText>حذف</ListItemText>
+                    </MenuItem>
+                </ActionMenu>
                 <Button onClick={() => setUploadBoxDialog({open: true})} variant="contained" startIcon={<CloudUploadIcon />}>آپلود</Button>
             </Stack>
 
@@ -214,17 +447,25 @@ const ObjectsList = () => {
 
             {ToolBar}
 
-            {objects !== null &&
             <DataGrid
                 checkboxSelection={true}
-                headerHeight={100}
                 pageSize={pageSize}
                 disableSelectionOnClick={true}
                 onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
                 columns={columns}
                 rows={objects}
+                onSelectionModelChange={(newSelectionModel) => {
+                    setSelectionModel(newSelectionModel);
+                }}
+                selectionModel={selectionModel}
+                checkboxSelectionVisibleOnly={true}
+                page={page}
+                paginationMode="server"
+                onPageChange={(newPage) => setPage(newPage)}
+                loading={loading}
+                rowCount={rowCount}
             />
-            }
+
         </div>
     );
 }

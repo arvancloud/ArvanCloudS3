@@ -6,8 +6,6 @@ function DataGrid(props) {
 
     const theme = useTheme();
 
-    console.log(props);
-
     return (
         <MuiDataGrid
             {...props}

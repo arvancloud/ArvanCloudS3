@@ -27,6 +27,7 @@ export default function ActionMenu(props) {
                 onClick={handleClick}
                 variant="outlined"
                 startIcon={<ExpandMoreIcon />}
+                disabled={props.disabled}
                 sx={{
                     fontWeight: 700,
                     color: 'black',
@@ -42,12 +43,13 @@ export default function ActionMenu(props) {
                     },
                 }}
             >
-                عملیات
+                {props.buttonTitle ? props.buttonTitle : "عملیات"}
             </Button>
             <Menu
                 id="basic-menu"
                 anchorEl={anchorEl}
                 open={open}
+                onClick={handleClose}
                 onClose={handleClose}
                 MenuListProps={{
                     'aria-labelledby': 'basic-button',

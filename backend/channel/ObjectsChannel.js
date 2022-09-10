@@ -1,21 +1,187 @@
 const Channel = Router.resolve('core/Channel');
-const { ListObjectsCommand } = require('@aws-sdk/client-s3');
+const { ListObjectsCommand, DeleteObjectCommand, DeleteObjectsCommand, PutObjectAclCommand, GetObjectCommand } = require('@aws-sdk/client-s3');
 const S3Helper = Router.resolve('helper/S3Helper');
 const Utility = Router.resolve('helper/Utility');
 const path = require('path');
 const fs = require('fs-extra');
+const { dialog } = require('electron');
 
 class ObjectsChannel extends Channel {
 
-    async getObjectsPro(profile, bucketName, page = 1){
+    async getObjectsPro(profile, bucketName, queryOptions){
 
         const s3 = S3Helper.getS3(profile);
+
+        GlobalData.CurrentBucktObjects = await S3Helper.getAllObjects(s3, bucketName);
 
         // return await s3.send(new ListObjectsCommand({
         //     Bucket: bucketName
         // }));
 
-        return await S3Helper.getAllObjects(s3, bucketName);
+        const objects = GlobalData.CurrentBucktObjects.slice(queryOptions.page * queryOptions.pageSize, (queryOptions.page + 1) * queryOptions.pageSize);
+
+        await Promise.all(objects.map(async (object) => {
+
+            object.IsPublic = await S3Helper.isPublicObject(s3, bucketName, object.Key);
+            object.id = object.Key;
+
+            return object;
+
+        }));
+
+        return {
+            count: GlobalData.CurrentBucktObjects.length,
+            objects: objects
+        }
+
+    }
+
+    async deleteObject(profile, bucketName, objectKey) {
+
+        const s3 = S3Helper.getS3(profile);
+
+        await s3.send(new DeleteObjectCommand({
+            Bucket: bucketName,
+            Key: objectKey,
+        }));
+
+    }
+
+    async deleteObjects(profile, bucketName, objectKeys) {
+
+        const s3 = S3Helper.getS3(profile);
+
+        await s3.send(new DeleteObjectsCommand({
+            Bucket: bucketName,
+            Delete: {
+                Objects: objectKeys.map(key => {
+                    return {Key: key}
+                })
+            },
+        }));
+
+    }
+
+    async setObjectIsPublic(profile, bucketName, objectKey, isPublic){
+
+        const s3 = S3Helper.getS3(profile);
+
+        const response = await s3.send(
+            new PutObjectAclCommand({
+                Bucket: bucketName,
+                Key: objectKey,
+                ACL: isPublic ? 'public-read' : 'private',
+            })
+        );
+
+    }
+
+    async setObjectsAcl(profile, bucketName, objectKeys, isPublic){
+
+        const s3 = S3Helper.getS3(profile);
+
+        for (let i = 0; i < objectKeys.length; i++){
+
+            await s3.send(
+                new PutObjectAclCommand({
+                    Bucket: bucketName,
+                    Key: objectKeys[i],
+                    ACL: isPublic ? 'public-read' : 'private',
+                })
+            );
+
+        }
+
+    }
+
+    async downloadObject(profile, bucketName, objectKey) {
+
+        const downloadPath = dialog.showSaveDialogSync(this.mainWindow ,{
+            title: objectKey,
+            defaultPath: path.basename(objectKey),
+            buttonLabel: "دانلود فایل",
+        });
+
+        if(!downloadPath)
+            return ;
+
+        const s3 = S3Helper.getS3(profile);
+
+        const data = await s3.send(new GetObjectCommand({
+            Bucket: bucketName,
+            Key: objectKey
+        }));
+
+        return await new Promise((resolve, reject) => {
+
+            const writeStream = fs.createWriteStream(downloadPath);
+
+            writeStream.on("finish", () => resolve(downloadPath));
+
+            writeStream.on("error", reject);
+
+            //writeStream.on("pipe", (r) => console.log("pipe"));
+
+            data.Body.pipe(writeStream);
+
+        });
+
+    }
+
+    async downloadObjects(profile, bucketName, objectKeys) {
+
+        let downloadPath = dialog.showOpenDialogSync(this.mainWindow ,{
+            title: "انتخاب پوشه برای دانلود",
+            defaultPath: "",
+            buttonLabel: "انتخاب پوشه",
+            properties: [
+                'openFile',
+                'openDirectory',
+                'promptToCreate'
+            ]
+        });
+
+        if(!downloadPath)
+            return ;
+
+        downloadPath = downloadPath[0];
+
+
+        const s3 = S3Helper.getS3(profile);
+
+        for (let i = 0; i < objectKeys.length; i++){
+
+            let objectPath = path.resolve(downloadPath, objectKeys[i]);
+            let objectDir = path.resolve(downloadPath, objectKeys[i], "..");
+
+            console.log(objectPath);
+            console.log(objectDir);
+
+            await fs.ensureDir(objectDir);
+
+            let data = await s3.send(new GetObjectCommand({
+                Bucket: bucketName,
+                Key: objectKeys[i]
+            }));
+
+            await new Promise((resolve, reject) => {
+
+                const writeStream = fs.createWriteStream(objectPath);
+
+                writeStream.on("finish", () => resolve(downloadPath));
+
+                writeStream.on("error", reject);
+
+                //writeStream.on("pipe", (r) => console.log("pipe"));
+
+                data.Body.pipe(writeStream);
+
+            });
+
+        }
+
+        return downloadPath;
+
     }
 
     async selectFilesForUpload(files, folders = []){

@@ -13,6 +13,8 @@ import BucketFinderDialog from "./dialogs/BucketFinderDialog/BucketFinderDialog"
 import Container from "@mui/material/Container";
 import ConfirmDialog from "./dialogs/ConfirmDialog/ConfirmDialog";
 import Box from "@mui/material/Box";
+import Backdrop from "@mui/material/Backdrop";
+import CircularProgress from "@mui/material/CircularProgress";
 
 function App(){
 
@@ -32,7 +34,9 @@ function App(){
         action: {},
     });
 
-
+    const [mainLoading , setMainLoading] = React.useState({
+        open: false,
+    });
 
     const layout = {
         notify: (message, options = {}) => {
@@ -56,6 +60,18 @@ function App(){
                 });
             },
         },
+        loading: {
+            show: () => {
+                setMainLoading({
+                    open: true
+                })
+            },
+            hide: () => {
+                setMainLoading({
+                    open: false
+                })
+            }
+        }
 
     };
 
@@ -107,6 +123,13 @@ function App(){
                     onClose={()=>setConfirmDialog({open: false, action: {}})}
                     action={confirmDialog.action}
                 />
+
+                <Backdrop
+                    sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+                    open={mainLoading.open}
+                >
+                    <CircularProgress color="inherit" />
+                </Backdrop>
 
             </LayoutContext.Provider>
 
