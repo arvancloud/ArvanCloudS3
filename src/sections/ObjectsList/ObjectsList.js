@@ -34,27 +34,33 @@ const ObjectsList = () => {
     const [pageSize, setPageSize] = React.useState(5);
     const [page, setPage] = React.useState(0);
     const [loading, setLoading] = React.useState(false);
-    const [objects, setObjects] = React.useState([]);
+    const [objects, setObjects] = React.useState(null);
     const [uploadBoxDialog, setUploadBoxDialog] = React.useState({open: false});
     const [goUploadDialog, setGoUploadDialog] = React.useState({open: false, data: {}});
     const [selectionModel, setSelectionModel] = React.useState([]);
+    const [sort, setSort] = React.useState([]);
 
     const queryOptions = React.useMemo(
         () => ({
             page,
             pageSize,
+            sort
         }),
-        [page, pageSize],
+        [page, pageSize, sort],
     );
 
-    console.log(queryOptions);
+    const loadObjects = async(clearCache = true) => {
 
-    const loadObjects = async() => {
+        if(clearCache){
+            layout.loading.show();
+        }
+        else{
+            setLoading(true);
+        }
 
-        setLoading(true);
 
         try{
-            const data = await window.channel("Objects@getObjectsPro", mountedProfile, mountedBucket, queryOptions);
+            const data = await window.channel("Objects@getObjectsPro", mountedProfile, mountedBucket, queryOptions, clearCache);
 
             setRowCount(data.count);
 
@@ -72,21 +78,38 @@ const ObjectsList = () => {
 
         }
 
+        layout.loading.hide();
         setLoading(false);
 
     }
 
     React.useEffect(() => {
 
-        console.log("change query");
+        console.log("ObjectsList mounted");
 
-        loadObjects()
+        loadObjects(true)
 
         return () => {
             console.log("ObjectsList un-mounted");
         }
 
+    }, []);
+
+    React.useEffect(() => {
+
+        if(objects !== null){
+            console.log("change query");
+
+            loadObjects(false);
+        }
+
     }, [queryOptions]);
+
+    const handleSortModelChange = React.useCallback((sortModel) => {
+
+        setSort(sortModel);
+
+    }, []);
 
     const handleDownloadObject = async (params) => {
 
@@ -214,10 +237,8 @@ const ObjectsList = () => {
     const handleBulkSetPublic = async () => {
 
         try {
-
             await window.channel("Objects@setObjectsAcl", mountedProfile, mountedBucket, selectionModel, true);
-
-            loadObjects();
+            loadObjects(false);
         }
         catch (e) {
             console.log(e);
@@ -235,7 +256,7 @@ const ObjectsList = () => {
 
             await window.channel("Objects@setObjectsAcl", mountedProfile, mountedBucket, selectionModel, false);
 
-            loadObjects();
+            loadObjects(false);
         }
         catch (e) {
             console.log(e);
@@ -447,6 +468,8 @@ const ObjectsList = () => {
 
             {ToolBar}
 
+            {objects &&
+
             <DataGrid
                 checkboxSelection={true}
                 pageSize={pageSize}
@@ -464,7 +487,12 @@ const ObjectsList = () => {
                 onPageChange={(newPage) => setPage(newPage)}
                 loading={loading}
                 rowCount={rowCount}
+                sortingMode="server"
+                onSortModelChange={handleSortModelChange}
             />
+
+            }
+
 
         </div>
     );

@@ -1,5 +1,5 @@
 const Channel = Router.resolve('core/Channel');
-const { ListObjectsCommand, DeleteObjectCommand, DeleteObjectsCommand, PutObjectAclCommand, GetObjectCommand } = require('@aws-sdk/client-s3');
+const { DeleteObjectCommand, DeleteObjectsCommand, PutObjectAclCommand, GetObjectCommand } = require('@aws-sdk/client-s3');
 const S3Helper = Router.resolve('helper/S3Helper');
 const Utility = Router.resolve('helper/Utility');
 const path = require('path');
@@ -8,17 +8,35 @@ const { dialog } = require('electron');
 
 class ObjectsChannel extends Channel {
 
-    async getObjectsPro(profile, bucketName, queryOptions){
+    async getObjectsPro(profile, bucketName, queryOptions, clearCache){
 
         const s3 = S3Helper.getS3(profile);
 
-        GlobalData.CurrentBucktObjects = await S3Helper.getAllObjects(s3, bucketName);
+        if(clearCache){
+            GlobalData.CurrentBucketObjects = [];
+            GlobalData.CurrentBucketObjects = await S3Helper.getAllObjects(s3, bucketName);
+            //console.log("load object from s3")
+        }
 
-        // return await s3.send(new ListObjectsCommand({
-        //     Bucket: bucketName
-        // }));
+        const start = queryOptions.page * queryOptions.pageSize;
+        const end = (queryOptions.page + 1) * queryOptions.pageSize;
 
-        const objects = GlobalData.CurrentBucktObjects.slice(queryOptions.page * queryOptions.pageSize, (queryOptions.page + 1) * queryOptions.pageSize);
+        let objects;
+
+        if(queryOptions.sort.length > 0){
+
+            if(queryOptions.sort[0].sort === "desc"){
+                objects = GlobalData.CurrentBucketObjects.sortBy(queryOptions.sort[0].field).reverse().slice(start, end);
+            }
+            else{
+                objects = GlobalData.CurrentBucketObjects.sortBy(queryOptions.sort[0].field).slice(start, end);
+            }
+        }
+        else{
+
+            objects = GlobalData.CurrentBucketObjects.slice(start, end);
+
+        }
 
         await Promise.all(objects.map(async (object) => {
 
@@ -30,7 +48,7 @@ class ObjectsChannel extends Channel {
         }));
 
         return {
-            count: GlobalData.CurrentBucktObjects.length,
+            count: GlobalData.CurrentBucketObjects.length,
             objects: objects
         }
 
