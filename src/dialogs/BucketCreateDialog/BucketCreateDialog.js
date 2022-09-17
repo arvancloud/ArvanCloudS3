@@ -59,16 +59,16 @@ export default function BucketCreateDialog (props) {
 
             if(err.Code === "InvalidBucketName"){
                 setValidationError({
-                    Name: "نام صندوقچه نا معتبر است"
+                    Name: "Invalid bucket name"
                 })
             }
             else if(err.Code === "ExistBucket"){
                 setValidationError({
-                    Name: "صندوقچه ای با این نام وجود دارد"
+                    Name: "Bucket with this name already exists"
                 })
             }
             else{
-                layout.notify("خطا در ایجاد صندوقچه", {
+                layout.notify("Error in creating the bucket", {
                     severity: "error"
                 });
             }
@@ -79,16 +79,16 @@ export default function BucketCreateDialog (props) {
 
     return (
         <Dialog open={open} onClose={onClose}>
-            <DialogTitle>ایجاد صندوقچه جدید</DialogTitle>
+            <DialogTitle>Create bucket</DialogTitle>
             <DialogContent>
                 <TextField
                     error={!!validationError.Name}
                     autoFocus
                     fullWidth
                     id="bucket-name"
-                    label="نام صندوقچه"
+                    label="Bucket name"
                     type="text"
-                    placeholder="این نام باید در کل سیستم یکتا باشد"
+                    placeholder="The name should be unique"
                     name="Name"
                     helperText={validationError.Name}
                     value={inputField.Name}
@@ -96,7 +96,7 @@ export default function BucketCreateDialog (props) {
                     size="small"
                 />
 
-                <span>دسترسی نمایش عمومی</span>
+                <span>Public read access</span>
                 <Switch
                     id="bucket-acl"
                     name="ACL"
@@ -106,8 +106,8 @@ export default function BucketCreateDialog (props) {
                 />
             </DialogContent>
             <DialogActions>
-                <Button color="secondary" variant="outlined" onClick={onClose}>انصراف</Button>
-                <Button variant="contained"  onClick={handleCreateBucket}>ایجاد</Button>
+                <Button color="secondary" variant="outlined" onClick={onClose}>Cancel</Button>
+                <Button variant="contained"  onClick={handleCreateBucket}>Create</Button>
             </DialogActions>
         </Dialog>
     );

@@ -23,7 +23,7 @@ function ConfirmDialog(props) {
                 {content}
             </DialogContent>
             <DialogActions>
-                <Button color={"secondary"} variant="outlined" onClick={onClose}>انصراف</Button>
+                <Button color={"secondary"} variant="outlined" onClick={onClose}>Cancel</Button>
                 <Button color={"error"} variant="contained" onClick={handleConfirm}>{title}</Button>
             </DialogActions>
         </Dialog>

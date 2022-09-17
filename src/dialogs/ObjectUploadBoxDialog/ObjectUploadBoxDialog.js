@@ -145,22 +145,22 @@ export default function ObjectUploadBoxDialog (props) {
 
     return (
         <Dialog open={open} fullWidth>
-            <DialogTitle>آپلود فایل در صندوقچه {bucketName}</DialogTitle>
+            <DialogTitle>Upload file in {bucketName} bucket</DialogTitle>
             <DialogContent>
 
                 <Box sx={sx} {...getRootPropsFiles()}>
                     <CloudUploadSvg/>
                     <div style={{width: '250px'}}>
-                        <Box sx={{fontSize: '24px'}}>آپلود فایل</Box>
+                        <Box sx={{fontSize: '24px'}}>Upload files</Box>
                         {
                             isDragActiveFiles ?
-                                <Box sx={{fontSize: '16px', color: 'secondary.main'}}>فایل را رها کنید.</Box> :
-                                <Box sx={{fontSize: '16px', color: 'secondary.main'}}>فایل را به اینجا بکشید.</Box>
+                                <Box sx={{fontSize: '16px', color: 'secondary.main'}}>Drop the files.</Box> :
+                                <Box sx={{fontSize: '16px', color: 'secondary.main'}}>Drag the files here.</Box>
 
                         }
                     </div>
                     <Button component="label" variant="contained">
-                        انتخاب فایل
+                        Choose file
                         <input onChange={handleSelectFiles} multiple hidden type="file" />
                     </Button>
                 </Box>
@@ -168,23 +168,23 @@ export default function ObjectUploadBoxDialog (props) {
                 <Box sx={sx} {...getRootPropsFolders()}>
                     <CloudUploadSvg/>
                     <div style={{width: '250px'}}>
-                        <Box sx={{fontSize: '24px'}}>آپلود پوشه</Box>
+                        <Box sx={{fontSize: '24px'}}>Upload folders</Box>
                         {
                             isDragActiveFolders ?
-                                <Box sx={{fontSize: '16px', color: 'secondary.main'}}>پوشه را رها کنید.</Box> :
-                                <Box sx={{fontSize: '16px', color: 'secondary.main'}}>پوشه را به اینجا بکشید.</Box>
+                                <Box sx={{fontSize: '16px', color: 'secondary.main'}}>Drop the folders.</Box> :
+                                <Box sx={{fontSize: '16px', color: 'secondary.main'}}>Drag the folders here.</Box>
 
                         }
                     </div>
                     <Button component="label" variant="contained">
-                        انتخاب پوشه
+                        Choose folder
                         <input webkitdirectory="true" onChange={handleSelectFolders} hidden type="file" />
                     </Button>
                 </Box>
 
             </DialogContent>
             <DialogActions>
-                <Button color="secondary" variant="outlined" onClick={onClose}>انصراف</Button>
+                <Button color="secondary" variant="outlined" onClick={onClose}>Cancel</Button>
             </DialogActions>
         </Dialog>
     );

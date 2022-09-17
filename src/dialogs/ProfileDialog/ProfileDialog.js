@@ -48,21 +48,21 @@ function ProfileDialog(props) {
 
             if(e.Code === "InvalidAccessKeyId"){
                 setValidationError({
-                    access_key: "مقدار وارد شده نامعتبر است"
+                    access_key: "The value is invalid"
                 })
             }
             else if(e.code === "ERR_INVALID_URL"){
                 setValidationError({
-                    endpoint_url: "مقدار وارد شده نامعتبر است"
+                    endpoint_url: "The value is invalid"
                 })
             }
             else if(e.Code === "SignatureDoesNotMatch"){
                 setValidationError({
-                    secret_key: "مقدار وارد شده اشتباه است"
+                    secret_key: "The value is incorrect"
                 })
             }
             else{
-                layout.notify("خطا در ذخیره کردن پروفایل", {
+                layout.notify("Error in save profile", {
                     severity: "error"
                 });
             }
@@ -74,13 +74,13 @@ function ProfileDialog(props) {
 
     return (
         <Dialog open={open} onClose={onClose}>
-            <DialogTitle>{profile.id ? 'ویرایش' : 'افزودن'} پروفایل</DialogTitle>
+            <DialogTitle>{profile.id ? 'Edit' : 'Add'} profile</DialogTitle>
             <DialogContent>
                 <TextField
                     autoFocus
                     size="small"
                     id="profile-title"
-                    label="عنوان پروفایل"
+                    label="Title"
                     type="text"
                     fullWidth
                     name="title"
@@ -90,15 +90,15 @@ function ProfileDialog(props) {
                 <TextField
                     size="small"
                     id="profile-provider"
-                    label="پرووایدر"
+                    label="Provider"
                     select
                     fullWidth
                     name="provider"
                     value={inputField.provider ? inputField.provider : "arvan"}
                     onChange={handleInputs}
                 >
-                    <MenuItem value="arvan">ابرآروان</MenuItem>
-                    <MenuItem value="other">سایر</MenuItem>
+                    <MenuItem value="arvan">Arvan Cloud</MenuItem>
+                    <MenuItem value="other">Other</MenuItem>
                 </TextField>
                 {
                     inputField.provider === "other" ?
@@ -155,7 +155,7 @@ function ProfileDialog(props) {
                 />
             </DialogContent>
             <DialogActions>
-                <Button color="secondary" variant="outlined" onClick={onClose}>انصراف</Button>
+                <Button color="secondary" variant="outlined" onClick={onClose}>Cancel</Button>
                 <Button
                     variant="contained"
                     disabled={
@@ -165,7 +165,7 @@ function ProfileDialog(props) {
                         (!inputField.endpoint_url && inputField.provider === "other")
                     }
                     onClick={handleSaveProfile}
-                >ذخیره</Button>
+                >Save</Button>
             </DialogActions>
         </Dialog>
     );

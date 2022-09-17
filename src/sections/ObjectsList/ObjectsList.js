@@ -70,7 +70,7 @@ const ObjectsList = () => {
 
             console.log(e);
 
-            layout.notify("خطا در دریافت فایل ها", {
+            layout.notify("Error in receiving objects", {
                 severity: "error"
             });
 
@@ -119,7 +119,7 @@ const ObjectsList = () => {
             const data = await window.channel("Objects@downloadObject", mountedProfile, mountedBucket, params.row.Key);
 
             if(data){
-                layout.notify("دانلود فایل با موفقیت انجام شد", {
+                layout.notify("The object has been downloaded successfully", {
                     severity: "success"
                 });
             }
@@ -128,7 +128,7 @@ const ObjectsList = () => {
         catch (e) {
             console.log(e);
 
-            layout.notify("خطا در دانلود فایل", {
+            layout.notify("Error in downloading object", {
                 severity: "error"
             });
         }
@@ -137,17 +137,13 @@ const ObjectsList = () => {
 
     };
 
-    const handleRenameObject = (params) => {
-
-    };
-
     const handleDeleteObject = (params) => {
 
         layout.confirm({
-            title: "حذف فایل",
+            title: "Delete object",
             content: (<>
-                <h3>فایل {params.row.Key} حذف شود؟</h3>
-                <p>این فایل برای همیشه از صندوقچه {mountedBucket} حذف می شود.</p>
+                <h3>Should {params.row.Key} be deleted?</h3>
+                <p>This object will be permanently removed from {mountedBucket}.</p>
             </>),
             onConfirm: async () => {
 
@@ -155,7 +151,7 @@ const ObjectsList = () => {
 
                     await window.channel("Objects@deleteObject", mountedProfile, mountedBucket, params.row.Key);
 
-                    layout.notify("فایل مورد نظر با موفقیت حذف شد", {
+                    layout.notify("The object has been deleted successfully", {
                         severity: "success"
                     });
 
@@ -166,7 +162,7 @@ const ObjectsList = () => {
 
                     console.log(e);
 
-                    layout.notify("خطا در حذف فایل", {
+                    layout.notify("Error in deleting object", {
                         severity: "error"
                     });
                 }
@@ -187,7 +183,7 @@ const ObjectsList = () => {
             objects[index].IsPublic = isPublic;
             setObjects(objects);
 
-            layout.notify("سطح دسترسی فایل با موفقیت به روز شد", {
+            layout.notify("The access level of the object has been successfully updated", {
                 severity: "success"
             });
 
@@ -197,7 +193,7 @@ const ObjectsList = () => {
 
             console.log(e);
 
-            layout.notify("خطا در تغییر سطح دسترسی فایل", {
+            layout.notify("Error in changing the access level", {
                 severity: "error"
             });
         }
@@ -215,7 +211,7 @@ const ObjectsList = () => {
             const data = await window.channel("Objects@downloadObjects", mountedProfile, mountedBucket, selectionModel);
 
             if(data){
-                layout.notify("دانلود فایل ها با موفقیت انجام شد", {
+                layout.notify("The objects have been downloaded successfully", {
                     severity: "success"
                 });
             }
@@ -224,7 +220,7 @@ const ObjectsList = () => {
         catch (e) {
             console.log(e);
 
-            layout.notify("خطا در دانلود فایل ها", {
+            layout.notify("Error in downloading objects", {
                 severity: "error"
             });
         }
@@ -243,7 +239,7 @@ const ObjectsList = () => {
         catch (e) {
             console.log(e);
 
-            layout.notify("خطا در تغییر سطح دسترسی", {
+            layout.notify("Error in changing the access level", {
                 severity: "error"
             });
         }
@@ -261,7 +257,7 @@ const ObjectsList = () => {
         catch (e) {
             console.log(e);
 
-            layout.notify("خطا در تغییر سطح دسترسی", {
+            layout.notify("Error in changing the access level", {
                 severity: "error"
             });
         }
@@ -270,10 +266,10 @@ const ObjectsList = () => {
     const handleBulkDeleteObjects = async () => {
 
         layout.confirm({
-            title: "حذف فایل ها",
+            title: "Delete objects",
             content: (<>
-                <h3>{selectionModel.length} فایل انتخاب شده حذف شود؟</h3>
-                <p>فایل ها برای همیشه از صندوقچه {mountedBucket} حذف می شود.</p>
+                <h3>Are you sure you want to delete the {selectionModel.length} files?</h3>
+                <p>These objects will be permanently removed from {mountedBucket}.</p>
             </>),
             onConfirm: async () => {
 
@@ -281,7 +277,7 @@ const ObjectsList = () => {
 
                     await window.channel("Objects@deleteObjects", mountedProfile, mountedBucket, selectionModel);
 
-                    layout.notify("فایل های مورد نظر با موفقیت حذف شد", {
+                    layout.notify("The objects have been deleted successfully", {
                         severity: "success"
                     });
 
@@ -292,7 +288,7 @@ const ObjectsList = () => {
 
                     console.log(e);
 
-                    layout.notify("خطا در حذف فایل ها", {
+                    layout.notify("Error in deleting objects", {
                         severity: "error"
                     });
                 }
@@ -312,8 +308,8 @@ const ObjectsList = () => {
 
         let size = params.value;
 
-        const sizes = ['بایت', 'کیلوبایت', 'مگابایت', 'گیگابایت', 'ترابایت']
-        if (size < 1024) return `${size} بایت`;
+        const sizes = ['B', 'KB', 'MB', 'GB', 'TB']
+        if (size < 1024) return `${size} B`;
         const i = parseInt(Math.floor(Math.log(size) / Math.log(1024)), 10)
 
         return `${(size / (1024 ** i)).toFixed(2)} ${sizes[i]}`
@@ -335,7 +331,7 @@ const ObjectsList = () => {
         },
         {
             field: 'Key',
-            headerName: 'نام فایل',
+            headerName: 'Object name',
             // renderCell: (params) => {
             //     console.log(params);
             //     return (
@@ -349,7 +345,7 @@ const ObjectsList = () => {
         {
             field: 'Size',
             type: 'number',
-            headerName: 'سایز',
+            headerName: 'Size',
             valueFormatter: getSizeAttribute,
             headerAlign: 'center',
             align: 'center',
@@ -359,7 +355,7 @@ const ObjectsList = () => {
             field: 'LastModified',
             type: 'datetime',
             valueFormatter: getLastModifiedAttribute,
-            headerName: 'آخرین تغییر',
+            headerName: 'Last modified',
             headerAlign: 'center',
             align: 'center',
             width: 150
@@ -367,7 +363,7 @@ const ObjectsList = () => {
         {
             field: 'IsPublic',
             sortable: false,
-            headerName: 'نمایش عمومی',
+            headerName: 'Public read',
             type: 'boolean',
             renderCell: (params) => {
                 return (
@@ -385,19 +381,13 @@ const ObjectsList = () => {
                         <ListItemIcon>
                             <CloudDownloadOutlinedIcon fontSize="small" />
                         </ListItemIcon>
-                        <ListItemText>دانلود</ListItemText>
-                    </MenuItem>
-                    <MenuItem onClick={handleRenameObject.bind(this, params)}>
-                        <ListItemIcon>
-                            <EditIcon fontSize="small" />
-                        </ListItemIcon>
-                        <ListItemText>تغییر نام</ListItemText>
+                        <ListItemText>Download object</ListItemText>
                     </MenuItem>
                     <MenuItem onClick={handleDeleteObject.bind(this, params)}>
                         <ListItemIcon>
                             <DeleteIcon fontSize="small" />
                         </ListItemIcon>
-                        <ListItemText>حذف</ListItemText>
+                        <ListItemText>Delete object</ListItemText>
                     </MenuItem>
                 </ActionMenu>
             ),
@@ -413,35 +403,35 @@ const ObjectsList = () => {
             <Stack direction="row" justifyContent="space-between" sx={{marginBottom: '1rem'}}>
                 <div>
                     <IconButton onClick={handleBackToBuckets}><BackIcon fontSize="small" /></IconButton>
-                    <span style={{fontSize: '16px', fontWeight: '700'}}>صندوقچه {mountedBucket}</span>
+                    <span style={{fontSize: '16px', fontWeight: '700'}}>Bucket {mountedBucket}</span>
                 </div>
-                <ActionMenu buttonTitle="عملیات گروهی" disabled={!selectionModel.length}>
+                <ActionMenu buttonTitle="Batch operation" disabled={!selectionModel.length}>
                     <MenuItem onClick={handleBulkDownloadObjects}>
                         <ListItemIcon>
                             <CloudDownloadOutlinedIcon fontSize="small" />
                         </ListItemIcon>
-                        <ListItemText>دانلود</ListItemText>
+                        <ListItemText>Download objects</ListItemText>
                     </MenuItem>
                     <MenuItem onClick={handleBulkSetPublic}>
                         <ListItemIcon>
                             <PublicIcon fontSize="small" />
                         </ListItemIcon>
-                        <ListItemText>دسترسی نمایش عمومی</ListItemText>
+                        <ListItemText>Access public read</ListItemText>
                     </MenuItem>
                     <MenuItem onClick={handleBulkSetPrivate}>
                         <ListItemIcon>
                             <PublicOffIcon fontSize="small" />
                         </ListItemIcon>
-                        <ListItemText>عدم نمایش عمومی</ListItemText>
+                        <ListItemText>Remove public read access</ListItemText>
                     </MenuItem>
                     <MenuItem onClick={handleBulkDeleteObjects}>
                         <ListItemIcon>
                             <DeleteIcon fontSize="small" />
                         </ListItemIcon>
-                        <ListItemText>حذف</ListItemText>
+                        <ListItemText>Delete objects</ListItemText>
                     </MenuItem>
                 </ActionMenu>
-                <Button onClick={() => setUploadBoxDialog({open: true})} variant="contained" startIcon={<CloudUploadIcon />}>آپلود</Button>
+                <Button onClick={() => setUploadBoxDialog({open: true})} variant="contained" startIcon={<CloudUploadIcon />}>Upload</Button>
             </Stack>
 
             <ObjectUploadBoxDialog

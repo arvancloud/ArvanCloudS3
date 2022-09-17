@@ -12,7 +12,7 @@ function DataGrid(props) {
             autoHeight={true}
             rowHeight={67}
             disableColumnMenu={true}
-            localeText={faIR.components.MuiDataGrid.defaultProps.localeText}
+            //localeText={faIR.components.MuiDataGrid.defaultProps.localeText}
             rowsPerPageOptions={[25, 15, 10, 5]}
             sortingOrder={['desc', 'asc']}
             sx={{

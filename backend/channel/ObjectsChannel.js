@@ -117,7 +117,7 @@ class ObjectsChannel extends Channel {
         const downloadPath = dialog.showSaveDialogSync(this.mainWindow ,{
             title: objectKey,
             defaultPath: path.basename(objectKey),
-            buttonLabel: "دانلود فایل",
+            buttonLabel: "Download Object",
         });
 
         if(!downloadPath)
@@ -149,9 +149,9 @@ class ObjectsChannel extends Channel {
     async downloadObjects(profile, bucketName, objectKeys) {
 
         let downloadPath = dialog.showOpenDialogSync(this.mainWindow ,{
-            title: "انتخاب پوشه برای دانلود",
+            title: "Select folder for download",
             defaultPath: "",
-            buttonLabel: "انتخاب پوشه",
+            buttonLabel: "Select Folder",
             properties: [
                 'openFile',
                 'openDirectory',

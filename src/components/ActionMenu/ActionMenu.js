@@ -43,7 +43,7 @@ export default function ActionMenu(props) {
                     },
                 }}
             >
-                {props.buttonTitle ? props.buttonTitle : "عملیات"}
+                {props.buttonTitle ? props.buttonTitle : "Action"}
             </Button>
             <Menu
                 id="basic-menu"

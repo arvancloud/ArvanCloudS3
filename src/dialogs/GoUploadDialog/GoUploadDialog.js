@@ -51,7 +51,7 @@ export default function GoUploadDialog (props) {
 
         window.ipcRenderer.on('uploadFiles@end', (event) => {
 
-            layout.notify("بارگذاری فایل ها با موفقیت انجام شد", {
+            layout.notify("The files have been uploaded successfully", {
                 severity: "success"
             });
 
@@ -62,7 +62,7 @@ export default function GoUploadDialog (props) {
 
         window.ipcRenderer.on('uploadFiles@abort', (event) => {
 
-            layout.notify("بارگذاری فایل ها متوقف شد", {
+            layout.notify("Uploading files stopped", {
                 severity: "warning"
             });
 
@@ -74,7 +74,7 @@ export default function GoUploadDialog (props) {
 
             console.log(e);
 
-            layout.notify("خطا در بارگذاری فایل ها", {
+            layout.notify("Error in uploading files", {
                 severity: "error"
             });
 
@@ -109,7 +109,7 @@ export default function GoUploadDialog (props) {
 
                 console.log(e);
 
-                layout.notify("خطا در بارگذاری فایل ها", {
+                layout.notify("Error in uploading files", {
                     severity: "error"
                 });
             }
@@ -130,17 +130,17 @@ export default function GoUploadDialog (props) {
 
     return (
         <Dialog open={open} fullWidth>
-            <DialogTitle>بارگذاری فایل در صندوقچه {bucketName}</DialogTitle>
+            <DialogTitle>Upload file in {bucketName} bucket</DialogTitle>
             {
                 open &&
                 <DialogContent>
                     <Stack spacing={2} style={{fontSize: '14px'}}>
                         <Stack direction="row" spacing={2} justifyContent="space-between" alignItems="center">
-                            <span>تعداد فایل</span>
+                            <span>Number of files</span>
                             <span>{ objectsData.count }</span>
                         </Stack>
                         <Stack direction="row" spacing={2} justifyContent="space-between" alignItems="center">
-                            <span>دسترسی نمایش عمومی</span>
+                            <span>Public read access</span>
                             <Switch
                                 id="objects-acl"
                                 name="ACL"
@@ -152,7 +152,7 @@ export default function GoUploadDialog (props) {
                         </Stack>
 
                         <ProgressBar percent={progress.mainPercent}>
-                            <span>{progress.mainProgress} از {progress.mainTotal}</span>
+                            <span>{progress.mainProgress} from {progress.mainTotal}</span>
                         </ProgressBar>
 
                         <ProgressBar percent={progress.objectPercent}>
@@ -164,8 +164,8 @@ export default function GoUploadDialog (props) {
                 </DialogContent>
             }
             <DialogActions>
-                <Button color="secondary" variant="outlined" disabled={finish} onClick={handleCancelOperation}>{processing ? "توقف" : "انصراف"}</Button>
-                <Button variant="contained" disabled={processing} onClick={handleUploadObjects}>{finish ? "پایان" : "بارگذاری"}</Button>
+                <Button color="secondary" variant="outlined" disabled={finish} onClick={handleCancelOperation}>{processing ? "Stop" : "Cancel"}</Button>
+                <Button variant="contained" disabled={processing} onClick={handleUploadObjects}>{finish ? "End" : "Upload"}</Button>
             </DialogActions>
         </Dialog>
     );

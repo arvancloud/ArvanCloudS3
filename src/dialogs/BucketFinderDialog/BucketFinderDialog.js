@@ -79,7 +79,7 @@ function BucketFinderDialog(props) {
 
     return (
         <Dialog open={open} onClose={onClose}>
-            <DialogTitle>انتخاب صندوقچه</DialogTitle>
+            <DialogTitle>Select bucket</DialogTitle>
             <DialogContent>
                 {profiles.map((profile) => {
                     return (
@@ -111,7 +111,7 @@ function BucketFinderDialog(props) {
                 })}
             </DialogContent>
             <DialogActions>
-                <Button variant="outlined" onClick={onClose}>انصراف</Button>
+                <Button variant="outlined" onClick={onClose}>Cancel</Button>
             </DialogActions>
         </Dialog>
     );

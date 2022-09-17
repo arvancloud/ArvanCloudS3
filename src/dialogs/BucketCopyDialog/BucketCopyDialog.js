@@ -14,7 +14,7 @@ export default function BucketCopyDialog (props) {
 
     const {open, onClose, source, dest, isSync} = props;
 
-    const operationName = isSync ? "سینک" : "کپی";
+    const operationName = isSync ? "Syncing" : "Copying";
 
     const [progress , setProgress] = React.useState({
         mainProgress: 0,
@@ -46,7 +46,7 @@ export default function BucketCopyDialog (props) {
 
         window.ipcRenderer.on('copyBucket@end', (event) => {
 
-            layout.notify(`${operationName} صندوقچه با موفقیت انجام شد`, {
+            layout.notify(`${operationName} bucket done`, {
                 severity: "success"
             });
 
@@ -57,7 +57,7 @@ export default function BucketCopyDialog (props) {
 
         window.ipcRenderer.on('copyBucket@abort', (event) => {
 
-            layout.notify(`${operationName} صندوقچه متوقف شد`, {
+            layout.notify(`${operationName} bucket stopped`, {
                 severity: "warning"
             });
 
@@ -69,7 +69,7 @@ export default function BucketCopyDialog (props) {
 
             console.log(e);
 
-            layout.notify(`خطا در ${operationName} صندوقچه `, {
+            layout.notify(`Error in ${operationName} the bucket `, {
                 severity: "error"
             });
 
@@ -97,7 +97,7 @@ export default function BucketCopyDialog (props) {
 
                 console.log(e);
 
-                layout.notify(`خطا در ${operationName} صندوقچه `, {
+                layout.notify(`Error in ${operationName} the bucket `, {
                     severity: "error"
                 });
             }
@@ -115,25 +115,25 @@ export default function BucketCopyDialog (props) {
 
     return (
         <Dialog open={open} fullWidth>
-            <DialogTitle>{operationName} کردن فایل های یک صندوقچه</DialogTitle>
+            <DialogTitle>{operationName} files of a bucket</DialogTitle>
             {
                 open &&
                 <DialogContent>
                     <Stack direction="row" spacing={2}>
                         <div>
-                            <h3>صندوقچه مبدا</h3>
+                            <h3>Source bucket</h3>
                             <h4>{source.bucket}</h4>
                             <h4>{source.profile.title}</h4>
                         </div>
                         <div>
-                            <h3>صندوقچه مقصد</h3>
+                            <h3>Destination bucket</h3>
                             <h4>{dest.bucket}</h4>
                             <h4>{dest.profile.title}</h4>
                         </div>
                     </Stack>
                     <Stack spacing={2}>
                         <ProgressBar percent={progress.mainPercent}>
-                            <span>{progress.mainProgress} از {progress.mainTotal}</span>
+                            <span>{progress.mainProgress} from {progress.mainTotal}</span>
                         </ProgressBar>
 
                         <ProgressBar percent={progress.objectPercent}>
@@ -143,8 +143,8 @@ export default function BucketCopyDialog (props) {
                 </DialogContent>
             }
             <DialogActions>
-                <Button color="secondary" variant="outlined" disabled={isFinish} onClick={handleCancelOperation}>{processing ? "توقف" : "انصراف"}</Button>
-                <Button variant="contained"  disabled={processing} onClick={handleCopyBucket}>{isFinish ? "پایان" : (isSync ? "سینک شود" : "کپی شود")}</Button>
+                <Button color="secondary" variant="outlined" disabled={isFinish} onClick={handleCancelOperation}>{processing ? "Stop" : "Cancel"}</Button>
+                <Button variant="contained"  disabled={processing} onClick={handleCopyBucket}>{isFinish ? "End" : (isSync ? "Sync" : "Copy")}</Button>
             </DialogActions>
         </Dialog>
     );

@@ -50,7 +50,7 @@ const ProfilesList = () => {
 
             console.log(e);
 
-            layout.notify("خطا در دریافت پروفایل ها", {
+            layout.notify("Error in receiving profiles", {
                 severity: "error"
             });
 
@@ -99,10 +99,10 @@ const ProfilesList = () => {
     const handleDeleteProfile = (profile, event) => {
 
         layout.confirm({
-            title: "حذف پروفایل",
+            title: "Delete profile",
             content: (
                 <span>
-                    آیا از حذف پروفایل {profile.title} مطمئن هستید؟
+                    Are you sure you want to delete {profile.title}'s profile?
                 </span>
             ),
             onConfirm: async () => {
@@ -111,7 +111,7 @@ const ProfilesList = () => {
 
                     await window.channel("Profiles@deleteProfile", profile);
 
-                    layout.notify("پروفایل مورد نظر با موفقیت حذف شد", {
+                    layout.notify("Profile deleted successfully", {
                         severity: "success"
                     });
 
@@ -122,7 +122,7 @@ const ProfilesList = () => {
 
                     console.log(e);
 
-                    layout.notify("خطا در حذف پروفایل", {
+                    layout.notify("Error in deleting the profile", {
                         severity: "error"
                     });
                 }
@@ -166,7 +166,7 @@ const ProfilesList = () => {
         },
         {
             field: 'title',
-            headerName: 'عنوان پروفایل',
+            headerName: 'Title',
             renderCell: (params) => {
 
                 return (
@@ -177,7 +177,7 @@ const ProfilesList = () => {
         },
         {
             field: 'endpoint_url',
-            headerName: 'نقطه اتصال',
+            headerName: 'Endpoint',
             minWidth: 200,
             flex: 0.8,
             align: 'center',
@@ -192,13 +192,13 @@ const ProfilesList = () => {
                         <ListItemIcon>
                             <EditIcon fontSize="small" />
                         </ListItemIcon>
-                        <ListItemText>ویرایش پروفایل</ListItemText>
+                        <ListItemText>Edit profile</ListItemText>
                     </MenuItem>
                     <MenuItem disableRipple onClick={handleDeleteProfile.bind(this, params.row)}>
                         <ListItemIcon>
                             <DeleteIcon fontSize="small" />
                         </ListItemIcon>
-                        <ListItemText>حذف پروفایل</ListItemText>
+                        <ListItemText>Delete profile</ListItemText>
                     </MenuItem>
                 </ActionMenu>
             ),
@@ -213,9 +213,9 @@ const ProfilesList = () => {
             <h3 style={{marginTop: '0'}}>Arvan S3</h3>
             <Stack direction="row" justifyContent="space-between" sx={{marginBottom: '1rem'}}>
                 <div>
-                    <span style={{fontSize: '16px', fontWeight: '700'}}>لیست پروفایل ها</span>
+                    <span style={{fontSize: '16px', fontWeight: '700'}}>Profiles</span>
                 </div>
-                <Button onClick={handleNewProfile} variant="contained" startIcon={<CloudIcon />}>ایجاد پروفایل</Button>
+                <Button onClick={handleNewProfile} variant="contained" startIcon={<CloudIcon />}>Add profile</Button>
             </Stack>
 
             <ProfileDialog
