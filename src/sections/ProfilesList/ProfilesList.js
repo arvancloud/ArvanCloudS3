@@ -159,7 +159,7 @@ const ProfilesList = () => {
             renderCell: (params) => {
 
                 return (
-                    <span>{params.api.getRowIndex(params.row.id) + 1}</span>
+                    <span className="row-index mouse-pointer" onClick={handleShowBuckets.bind(this, params.row)}>{params.api.getRowIndex(params.row.id) + 1}</span>
                 )
             },
             width: 50,
@@ -170,10 +170,10 @@ const ProfilesList = () => {
             renderCell: (params) => {
 
                 return (
-                    <span onClick={handleShowBuckets.bind(this, params.row)}>{params.row.title}</span>
+                    <span className="mouse-pointer" onClick={handleShowBuckets.bind(this, params.row)}>{params.row.title}</span>
                 )
             },
-            width: 200
+            width: 250
         },
         {
             field: 'endpoint_url',
@@ -204,7 +204,7 @@ const ProfilesList = () => {
             ),
             headerName: '',
             align: 'center',
-            width: 122,
+            width: 150,
         }
     ];
 

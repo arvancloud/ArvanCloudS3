@@ -300,7 +300,7 @@ const ObjectsList = () => {
 
     function getLastModifiedAttribute(params) {
 
-        return moment(params.value).locale('fa').format('DD MMMM YYYY - HH:mm');
+        return moment(params.value).locale('en').format('DD MMMM YYYY - HH:mm');
 
     }
 
@@ -324,7 +324,7 @@ const ObjectsList = () => {
             renderCell: (params) => {
 
                 return (
-                    <span>{page * pageSize + params.api.getRowIndex(params.row.id) + 1}</span>
+                    <span className="row-index">{page * pageSize + params.api.getRowIndex(params.row.id) + 1}</span>
                 )
             },
             width: 50,
@@ -349,7 +349,7 @@ const ObjectsList = () => {
             valueFormatter: getSizeAttribute,
             headerAlign: 'center',
             align: 'center',
-            width: 120,
+            width: 90,
         },
         {
             field: 'LastModified',
@@ -358,7 +358,7 @@ const ObjectsList = () => {
             headerName: 'Last modified',
             headerAlign: 'center',
             align: 'center',
-            width: 150
+            width: 200
         },
         {
             field: 'IsPublic',
@@ -370,7 +370,7 @@ const ObjectsList = () => {
                     <Switch checked={params.row.IsPublic} onChange={handleChangeAcl.bind(this, params)} />
                 )
             },
-            width: 150
+            width: 100
         },
         {
             field: 'actions',
@@ -393,7 +393,7 @@ const ObjectsList = () => {
             ),
             headerName: '',
             align: 'center',
-            width: 122
+            width: 140
         }
     ];
 

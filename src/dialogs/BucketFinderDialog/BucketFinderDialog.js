@@ -14,6 +14,7 @@ import ListItemText from "@mui/material/ListItemText";
 import ListItemButton from "@mui/material/ListItemButton";
 import BucketIcon from "../../components/UI/Icons/BucketIcon";
 import ExpandMoreIcon from "../../components/UI/Icons/ExpandMoreIcon";
+import CloudIcon from '@mui/icons-material/Cloud';
 
 function BucketFinderDialog(props) {
 
@@ -78,7 +79,7 @@ function BucketFinderDialog(props) {
     };
 
     return (
-        <Dialog open={open} onClose={onClose}>
+        <Dialog open={open} onClose={onClose} fullWidth>
             <DialogTitle>Select bucket</DialogTitle>
             <DialogContent>
                 {profiles.map((profile) => {
@@ -86,18 +87,23 @@ function BucketFinderDialog(props) {
                         <Accordion key={`profile-${profile.id}`} expanded={expanded === `profile-${profile.id}`} onChange={handleSelectProfile(profile)}>
                             <AccordionSummary
                                  expandIcon={<ExpandMoreIcon />}
+                                 sx={{
+                                     color: 'secondary.main'
+                                 }}
                             >
-                                {profile.title}
+                                <CloudIcon style={{marginRight: '1rem'}} /> {profile.title}
                             </AccordionSummary>
-                            <AccordionDetails>
+                            <AccordionDetails sx={{
+                                color: 'primary.main'
+                            }}>
                                 {
                                     expanded === `profile-${profile.id}` &&
                                     <List>
                                         {selectedProfile.buckets.map(bucket =>
                                             <ListItem disablePadding>
                                                 <ListItemButton onClick={handleSelectBucket.bind(this, bucket.Name)}>
-                                                    <ListItemIcon>
-                                                        <BucketIcon />
+                                                    <ListItemIcon sx={{ color: 'primary.main'}} >
+                                                        <BucketIcon style={{fontSize: '1.3rem'}} />
                                                     </ListItemIcon>
                                                     <ListItemText primary={bucket.Name} />
                                                 </ListItemButton>
@@ -111,7 +117,7 @@ function BucketFinderDialog(props) {
                 })}
             </DialogContent>
             <DialogActions>
-                <Button variant="outlined" onClick={onClose}>Cancel</Button>
+                <Button variant="outlined" color="secondary" onClick={onClose}>Cancel</Button>
             </DialogActions>
         </Dialog>
     );

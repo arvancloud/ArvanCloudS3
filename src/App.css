@@ -36,3 +36,21 @@
     transform: rotate(360deg);
   }
 }
+
+.row-index{
+  height: 1.5rem;
+  width: 1.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-left: 5px;
+  background-color: #f5f7fa;
+  border-radius: 6px;
+  text-align: center;
+  color: #7a90aa;
+  font-size: 0.65rem;
+}
+
+.mouse-pointer{
+  cursor: pointer;
+}

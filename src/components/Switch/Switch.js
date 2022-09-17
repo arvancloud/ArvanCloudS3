@@ -38,7 +38,7 @@ function Switch(props) {
                         backgroundColor: 'white',
                     },
                     '.Mui-checked:hover': {
-                        backgroundColor: 'white',
+                        backgroundColor: 'white!important',
                     }
                 },
                 '& .MuiSwitch-track': {

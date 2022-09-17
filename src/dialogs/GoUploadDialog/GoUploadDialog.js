@@ -134,7 +134,7 @@ export default function GoUploadDialog (props) {
             {
                 open &&
                 <DialogContent>
-                    <Stack spacing={2} style={{fontSize: '14px'}}>
+                    <Stack spacing={3} style={{fontSize: '14px'}}>
                         <Stack direction="row" spacing={2} justifyContent="space-between" alignItems="center">
                             <span>Number of files</span>
                             <span>{ objectsData.count }</span>

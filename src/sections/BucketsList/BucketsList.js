@@ -31,8 +31,11 @@ const BucketsList = () => {
     const [buckets, setBuckets] = React.useState([]);
     const [bucketCreateDialog, setBucketCreateDialog] = React.useState({open: false});
     const [bucketCopyDialog, setBucketCopyDialog] = React.useState({open: false, source: {}, dest: {}, isSync: false});
+    const [loading, setLoading] = React.useState(false);
 
     const loadBuckets = async() => {
+
+        setLoading(true);
 
         try{
             const rows = await window.channel("Buckets@getBucketsWithAcl", mountedProfile);
@@ -53,6 +56,8 @@ const BucketsList = () => {
             setBuckets(null);
 
         }
+
+        setLoading(false);
 
     }
 
@@ -215,7 +220,7 @@ const BucketsList = () => {
             renderCell: (params) => {
 
                 return (
-                    <span>{params.api.getRowIndex(params.row.id) + 1}</span>
+                    <span className="row-index mouse-pointer" onClick={handleShowObjects.bind(this, params.id)}>{params.api.getRowIndex(params.row.id) + 1}</span>
                 )
             },
             width: 50,
@@ -226,7 +231,7 @@ const BucketsList = () => {
             renderCell: (params) => {
 
                 return (
-                    <span onClick={handleShowObjects.bind(this, params.id)}>{params.row.Name}</span>
+                    <span className="mouse-pointer" onClick={handleShowObjects.bind(this, params.id)}>{params.row.Name}</span>
                 )
             },
             //maxWidth: 400,
@@ -238,7 +243,7 @@ const BucketsList = () => {
             type: 'datetime',
             valueFormatter: getCreationDateAttribute,
             headerName: 'Creation date',
-            width: 150,
+            width: 220,
             align: 'center',
             headerAlign: 'center',
 
@@ -281,7 +286,7 @@ const BucketsList = () => {
             ),
             headerName: '',
             align: 'center',
-            width: 122,
+            width: 150,
         }
     ];
 
@@ -322,6 +327,7 @@ const BucketsList = () => {
                     disableSelectionOnClick={true}
                     onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
                     columns={columns}
+                    loading={loading}
                     rows={buckets}
                 />
             }

@@ -7,6 +7,7 @@ import Button from "@mui/material/Button";
 import TextField from "../../components/TextField/TextField";
 import Switch from "../../components/Switch/Switch";
 import LayoutContext from "../../contexts/LayoutContext";
+import Stack from "@mui/material/Stack";
 
 export default function BucketCreateDialog (props) {
 
@@ -78,32 +79,35 @@ export default function BucketCreateDialog (props) {
     }
 
     return (
-        <Dialog open={open} onClose={onClose}>
+        <Dialog open={open} onClose={onClose} fullWidth>
             <DialogTitle>Create bucket</DialogTitle>
             <DialogContent>
-                <TextField
-                    error={!!validationError.Name}
-                    autoFocus
-                    fullWidth
-                    id="bucket-name"
-                    label="Bucket name"
-                    type="text"
-                    placeholder="The name should be unique"
-                    name="Name"
-                    helperText={validationError.Name}
-                    value={inputField.Name}
-                    onChange={inputsHandler}
-                    size="small"
-                />
-
-                <span>Public read access</span>
-                <Switch
-                    id="bucket-acl"
-                    name="ACL"
-                    checked={inputField.ACL}
-                    value={inputField.ACL}
-                    onChange={inputsHandler}
-                />
+                <Stack spacing={2} style={{fontSize: '14px'}}>
+                    <TextField
+                        error={!!validationError.Name}
+                        autoFocus
+                        fullWidth
+                        id="bucket-name"
+                        label="Bucket name"
+                        type="text"
+                        placeholder="The name should be unique"
+                        name="Name"
+                        helperText={validationError.Name}
+                        value={inputField.Name}
+                        onChange={inputsHandler}
+                        size="small"
+                    />
+                    <Stack direction="row" spacing={2} justifyContent="space-between" alignItems="center">
+                        <span>Public read access</span>
+                        <Switch
+                            id="bucket-acl"
+                            name="ACL"
+                            checked={inputField.ACL}
+                            value={inputField.ACL}
+                            onChange={inputsHandler}
+                        />
+                    </Stack>
+                </Stack>
             </DialogContent>
             <DialogActions>
                 <Button color="secondary" variant="outlined" onClick={onClose}>Cancel</Button>

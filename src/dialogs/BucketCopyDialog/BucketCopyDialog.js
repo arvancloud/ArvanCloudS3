@@ -119,19 +119,19 @@ export default function BucketCopyDialog (props) {
             {
                 open &&
                 <DialogContent>
-                    <Stack direction="row" spacing={2}>
+                    <Stack direction="row" spacing={2} justifyContent="space-between" style={{textAlign: "center"}}>
                         <div>
-                            <h3>Source bucket</h3>
-                            <h4>{source.bucket}</h4>
-                            <h4>{source.profile.title}</h4>
+                            <span style={{color: '#7a90aa'}}>Source bucket</span>
+                            <h2 style={{color: '#00baba'}}>{source.bucket}</h2>
+                            <h5 style={{color: '#bbb'}}>{source.profile.title}</h5>
                         </div>
                         <div>
-                            <h3>Destination bucket</h3>
-                            <h4>{dest.bucket}</h4>
-                            <h4>{dest.profile.title}</h4>
+                            <span style={{color: '#7a90aa'}}>Destination bucket</span>
+                            <h2 style={{color: '#00baba'}}>{dest.bucket}</h2>
+                            <h5 style={{color: '#bbb'}}>{dest.profile.title}</h5>
                         </div>
                     </Stack>
-                    <Stack spacing={2}>
+                    <Stack spacing={2} style={{marginTop: '2rem'}}>
                         <ProgressBar percent={progress.mainPercent}>
                             <span>{progress.mainProgress} from {progress.mainTotal}</span>
                         </ProgressBar>

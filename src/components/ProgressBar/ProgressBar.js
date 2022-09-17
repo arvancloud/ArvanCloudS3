@@ -10,7 +10,7 @@ function ProgressBar(props) {
         }}>
             <Stack style={{position: 'absolute', right: '1rem', top: 0, left: '1rem', bottom: 0, zIndex: 3}} direction="row" spacing={2} justifyContent="space-between" alignItems="center">
                 <span>{props.children}</span>
-                <span style={{color: 'primary.main'}}>{props.percent}%</span>
+                <span style={{color: 'primary.main'}}>{props.percent.toFixed(1)}%</span>
             </Stack>
 
             <MuiLinearProgress

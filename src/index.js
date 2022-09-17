@@ -23,7 +23,7 @@ function RTL(props) {
 
 
 let theme = createTheme({
-    direction: 'rtl',
+    direction: 'ltr',
     palette: {
         primary: {
             main: '#00baba',
@@ -36,7 +36,7 @@ let theme = createTheme({
         },
     },
     typography: {
-        fontFamily: 'YekanBakh',
+        //fontFamily: 'YekanBakh',
     },
     components: {
         MuiButton: {
@@ -46,6 +46,7 @@ let theme = createTheme({
             styleOverrides: {
                 root: ({ownerState, theme}) => ({
                     fontSize: '0.87rem',
+                    textTransform: 'none',
                     fontWeight: 500,
                     padding: '0.75rem 1rem',
                     height: '2.5rem',
@@ -106,9 +107,7 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
       <ThemeProvider theme={theme}>
-          <RTL>
-              <App />
-          </RTL>
+          <App />
       </ThemeProvider>
   </React.StrictMode>
 );
