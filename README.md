@@ -40,6 +40,21 @@ Follow the guideline for [commit messages](#commit-messages) and then:
 When you are done with that push your changes to Github:
 
     git push -u origin my-new-feature
+    
+### Run The Project ###
+
+For run the project install dependencies first:
+
+    npm install
+    
+Then run project on dev mode:
+
+    npm start
+    
+For run the project on production mode:
+
+    npm run react-build             # To build frontend in build folder
+    electron .
 
 ## Writing Documentation ##
 
