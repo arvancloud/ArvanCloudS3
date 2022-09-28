@@ -53,6 +53,13 @@ function BucketFinderDialog(props) {
 
     }, []);
 
+    React.useEffect(() => {
+
+        loadProfiles();
+        setExpanded(null);
+
+    }, [open]);
+
     const handleSelectBucket = async (bucket) => {
 
         onSelectBucket(bucket, selectedProfile);
