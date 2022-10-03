@@ -6,62 +6,185 @@ import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
 import LayoutContext from "../../contexts/LayoutContext";
 import {useDropzone} from 'react-dropzone';
+import Box from "@mui/material/Box";
+import CloudUploadSvg from "../../components/UI/Svg/CloudUploadSvg";
 
 export default function ObjectUploadBoxDialog (props) {
 
-    const layout = React.useContext(LayoutContext);
+    //const layout = React.useContext(LayoutContext);
 
-    const {open, onClose, afterUpload, mountedProfile, bucketName} = props;
+    const {open, onClose, prepareUpload, mountedProfile, bucketName} = props;
 
-    const handleSelectFiles = async (e) => {
+    const handleSelectFolders = async (e) => {
 
-        console.log("length");
-        console.log(e);
-        console.log(e.target.files.length);
+        if(e.target.files.length){
 
-        // const sss = window.channel("Windows@dialog");
-        // console.log(sss);
+            const files = [];
+
+            for (let i = 0; i < e.target.files.length; i++) {
+
+                const file = e.target.files.item(i);
+
+                files.push({
+                    Path: file.path,
+                    Size: file.size,
+                    Key: file.webkitRelativePath,
+                });
+            }
+
+            const data = await window.channel("Objects@selectFilesForUpload", files);
+
+            prepareUpload(data);
+            onClose();
+        }
 
     }
 
-    const onDrop = React.useCallback(async (acceptedFiles) => {
-        // Do something with the files
-        console.log(acceptedFiles);
+    const handleSelectFiles = async (e) => {
 
-        let data = await window.channel("Objects@uploadFiles", mountedProfile, bucketName, acceptedFiles.map(file => {
+        if(e.target.files.length){
+
+            const files = [];
+
+            for (let i = 0; i < e.target.files.length; i++) {
+
+                const file = e.target.files.item(i);
+
+                files.push({
+                    Path: file.path,
+                    Size: file.size,
+                    Key: file.name,
+                });
+            }
+
+            const data = await window.channel("Objects@selectFilesForUpload", files);
+
+            prepareUpload(data);
+            onClose();
+        }
+
+    }
+
+    const getFolderFromEvent = async function (event) {
+
+        if(event.type === "drop"){
+
+            const files = [];
+
+            for (let i = 0; i < event.dataTransfer.files.length; i++) {
+
+                const file = event.dataTransfer.files.item(i);
+
+                //if(file.type === "" && file.size === 0){
+                    files.push({
+                        FolderName: file.name,
+                        Path: file.path,
+                    });
+                //}
+
+            }
+
+            return files;
+        }
+
+        return [];
+
+    }
+
+    const onDropFiles = React.useCallback(async (acceptedFiles, rejectedFiles, event) => {
+
+        const data = await window.channel("Objects@selectFilesForUpload", acceptedFiles.map(file => {
             return {
-                path: file.path,
-                size: file.size
+                Path: file.path,
+                Size: file.size,
+                Key: file.name,
             }
         }));
-        console.log(data);
+
+        prepareUpload(data);
+        onClose();
+
     }, []);
 
-    const {getRootProps, getInputProps, isDragActive} = useDropzone({onDrop})
+    const onDropFolders = React.useCallback(async (acceptedFolders, rejectedFolders, event) => {
+
+        const data = await window.channel("Objects@selectFilesForUpload", [], acceptedFolders);
+
+        prepareUpload(data);
+        onClose();
+
+    }, []);
+
+    const {getRootProps: getRootPropsFiles, isDragActive: isDragActiveFiles} = useDropzone({
+        onDrop: onDropFiles,
+        useFsAccessApi: false,
+        multiple: true,
+        noClick: true
+    });
+
+    const {getRootProps: getRootPropsFolders, isDragActive: isDragActiveFolders} = useDropzone({
+        onDrop: onDropFolders,
+        multiple: true,
+        getFilesFromEvent: event => getFolderFromEvent(event),
+        noClick: true
+    });
+
+    const sx = {
+        display: 'flex',
+        justifyContent: 'space-around',
+        alignItems: 'center',
+        backgroundColor: 'primary.light',
+        borderWidth: '.125rem',
+        borderStyle: 'dashed',
+        borderColor: 'primary.main',
+        borderRadius: '1rem',
+        padding: '1rem',
+        marginTop: '24px',
+        color: 'primary.main',
+    };
 
     return (
-        <Dialog open={open}>
-            <DialogTitle>آپلود فایل در صندوقچه {bucketName}</DialogTitle>
+        <Dialog open={open} fullWidth>
+            <DialogTitle>Upload file in {bucketName} bucket</DialogTitle>
             <DialogContent>
-                <Button variant="contained" component="label">
-                    Upload
-                    <input onChange={handleSelectFiles} hidden multiple type="file" />
-                </Button>
-                <Button variant="contained" component="label">
-                    Upload Folder
-                    <input webkitdirectory="true" onChange={handleSelectFiles} hidden type="file" />
-                </Button>
-                <div style={{border: "1px solid #a0a"}} {...getRootProps()}>
-                    <input {...getInputProps()} />
-                    {
-                        isDragActive ?
-                            <p>Drop the files here ...</p> :
-                            <p>Drag 'n' drop some files here, or click to select files</p>
-                    }
-                </div>
+
+                <Box sx={sx} {...getRootPropsFiles()}>
+                    <CloudUploadSvg/>
+                    <div style={{width: '250px'}}>
+                        <Box sx={{fontSize: '24px'}}>Upload files</Box>
+                        {
+                            isDragActiveFiles ?
+                                <Box sx={{fontSize: '16px', color: 'secondary.main'}}>Drop the files.</Box> :
+                                <Box sx={{fontSize: '16px', color: 'secondary.main'}}>Drag the files here.</Box>
+
+                        }
+                    </div>
+                    <Button component="label" variant="contained">
+                        Choose file
+                        <input onChange={handleSelectFiles} multiple hidden type="file" />
+                    </Button>
+                </Box>
+
+                <Box sx={sx} {...getRootPropsFolders()}>
+                    <CloudUploadSvg/>
+                    <div style={{width: '250px'}}>
+                        <Box sx={{fontSize: '24px'}}>Upload folders</Box>
+                        {
+                            isDragActiveFolders ?
+                                <Box sx={{fontSize: '16px', color: 'secondary.main'}}>Drop the folders.</Box> :
+                                <Box sx={{fontSize: '16px', color: 'secondary.main'}}>Drag the folders here.</Box>
+
+                        }
+                    </div>
+                    <Button component="label" variant="contained">
+                        Choose folder
+                        <input webkitdirectory="true" onChange={handleSelectFolders} hidden type="file" />
+                    </Button>
+                </Box>
+
             </DialogContent>
             <DialogActions>
-                <Button variant="outlined" onClick={onClose}>انصراف</Button>
+                <Button color="secondary" variant="outlined" onClick={onClose}>Cancel</Button>
             </DialogActions>
         </Dialog>
     );

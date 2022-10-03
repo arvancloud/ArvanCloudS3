@@ -13,10 +13,6 @@ class ProfilesChannel extends Channel {
 
     async saveProfile(profile) {
 
-        if(profile.provider === "arvan"){
-            profile.endpoint_url = "https://s3.ir-thr-at1.arvanstorage.com";
-        }
-
         const s3 = S3Helper.getS3(profile);
 
         await s3.send(new ListBucketsCommand({}));

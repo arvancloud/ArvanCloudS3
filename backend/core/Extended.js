@@ -10,3 +10,9 @@ Array.prototype.max = function (iteratee) {
     return _.max(this, iteratee)
 
 };
+
+Array.prototype.sortBy = function (iteratee) {
+
+    return _.sortBy(this, iteratee)
+
+};

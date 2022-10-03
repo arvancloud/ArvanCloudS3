@@ -40,6 +40,40 @@ Follow the guideline for [commit messages](#commit-messages) and then:
 When you are done with that push your changes to Github:
 
     git push -u origin my-new-feature
+    
+### Run The Project ###
+
+For run the project install dependencies first:
+
+    npm install
+    
+Then run project on dev mode:
+
+    npm start
+    
+For run the project on production mode:
+
+    npm run react-build             # To build frontend in build folder
+    electron .
+
+## Package The Project ##
+
+- Build frontend in build folder: `npm run react-build`
+- Find version of electron from package.json in devDependencies
+- Visit https://github.com/electron/electron/releases
+- Download proportional version and extract
+    - Current link: https://github.com/electron/electron/releases/download/v19.0.9/electron-v19.0.9-win32-x64.zip
+- Directory of project must be place in **resource/app**
+- Run electron.exe
+- Package the project with a installer software such as **Advanced Installer**
+
+#### In resource/app directory:
+
+- `backend/store/user-data.json` must be exist and empty
+- forget `public` folder
+- forget `src` folder
+- `node_modules` folder just need main dependencies
+    - `npm install --production`
 
 ## Writing Documentation ##
 

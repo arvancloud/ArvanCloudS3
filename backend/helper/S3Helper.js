@@ -7,7 +7,8 @@ const {
     UploadPartCommand,
     ListObjectsCommand,
     GetObjectCommand,
-    GetObjectAclCommand
+    GetObjectAclCommand,
+    GetBucketAclCommand,
 } = require('@aws-sdk/client-s3');
 
 const fs = require('fs-extra');
@@ -193,7 +194,7 @@ module.exports.getAllObjects = async (s3, bucketName) => {
         Bucket: bucketName
     }));
 
-    let objects = data.Contents;
+    let objects = data.Contents ? data.Contents : [];
     let nextMarker = data.NextMarker;
 
     //console.log("IsTruncated", data.IsTruncated);
@@ -210,8 +211,6 @@ module.exports.getAllObjects = async (s3, bucketName) => {
         nextMarker = data.NextMarker;
 
     }
-
-    console.log("length", objects.length);
 
     return objects;
 
@@ -252,6 +251,18 @@ module.exports.isPublicObject = async (s3, bucketName, objectKey) => {
         new GetObjectAclCommand({
             Bucket: bucketName,
             Key: objectKey
+        })
+    );
+
+    return response.Grants[0] ? response.Grants[0].Permission === "READ" : false;
+
+};
+
+module.exports.isPublicBucket = async (s3, bucketName) => {
+
+    const response = await s3.send(
+        new GetBucketAclCommand({
+            Bucket: bucketName
         })
     );
 

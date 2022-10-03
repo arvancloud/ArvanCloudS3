@@ -3,11 +3,12 @@ global.Router = require("./backend/core/Router.js").Router;
 Router.resolve("core/Extended");
 
 global.GlobalData = {
-    AppInProcess: false
+    AppInProcess: false,
+    CurrentBucketObjects: []
 };
 global.Store = Router.resolve("core/Store");
 
-const {BrowserWindow , app, ipcMain} = require('electron') // app : control application life.
+const {BrowserWindow , app, ipcMain, dialog} = require('electron') // app : control application life.
 const cors = require('cors')
 //const Sequelize = require('sequelize')
 const find = require('find-process');
@@ -72,13 +73,37 @@ function CreateWindow() {
     // Create the browser window.
 
     mainWindow = new BrowserWindow({
-        width: 800,
-        height: 600,
+        width: 1024,
+        height: 768,
+        minWidth: 1024,
+        minHeight: 768,
+        icon: path.join(__dirname, 'icon.png'),
+        autoHideMenuBar: true,
+        show: false,
         webPreferences: {
             nodeIntegration: false,
             contextIsolation: false,
             preload: path.join(__dirname, 'preload.js')
         }
+    });
+
+    mainWindow.maximize();
+    mainWindow.show();
+
+    mainWindow.on('close', async e => {
+        e.preventDefault();
+
+        if(GlobalData.AppInProcess){
+            const { response } = await dialog.showMessageBox(mainWindow, {
+                type: 'info',
+                title: 'Processing',
+                message: 'The program is executing the operation. It is not possible to exit.',
+            });
+        }
+        else{
+            mainWindow.destroy();
+        }
+
     });
 
     mainWindow.loadFile('backend/view/loading.html');

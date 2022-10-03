@@ -30,12 +30,15 @@ const BucketsList = () => {
     const [pageSize, setPageSize] = React.useState(5);
     const [buckets, setBuckets] = React.useState([]);
     const [bucketCreateDialog, setBucketCreateDialog] = React.useState({open: false});
-    const [bucketCopyDialog, setBucketCopyDialog] = React.useState({open: false, source: {}, dest: {}});
+    const [bucketCopyDialog, setBucketCopyDialog] = React.useState({open: false, source: {}, dest: {}, isSync: false});
+    const [loading, setLoading] = React.useState(false);
 
     const loadBuckets = async() => {
 
+        setLoading(true);
+
         try{
-            const rows = await window.channel("Buckets@getBuckets", mountedProfile);
+            const rows = await window.channel("Buckets@getBucketsWithAcl", mountedProfile);
 
             setBuckets(rows.map((item) => {
                 item.id = item.Name;
@@ -46,13 +49,15 @@ const BucketsList = () => {
 
             console.log(e);
 
-            layout.notify("خطا در دریافت صندوقچه ها", {
+            layout.notify("Error in receiving buckets", {
                 severity: "error"
             });
 
             setBuckets(null);
 
         }
+
+        setLoading(false);
 
     }
 
@@ -64,9 +69,6 @@ const BucketsList = () => {
 
         loadBuckets();
 
-        window.ipcRenderer.on('ping', (event, data) => {
-            console.log(data);
-        });
 
         return () => {
             console.log("BucketList un-mounted");
@@ -74,7 +76,7 @@ const BucketsList = () => {
 
     }, []);
 
-    const handleCopyBucket = async (params) => {
+    const handleCopyBucket = (params) => {
 
         layout.bucketFinder.show((bucket, profile) => {
 
@@ -87,24 +89,40 @@ const BucketsList = () => {
                 dest: {
                     bucket: bucket,
                     profile: profile
-                }
+                },
+                isSync: false
             })
         });
 
     };
 
     const handleSyncBucket = (params) => {
-        console.log(params)
-        layout.notify("سینک");
+
+        layout.bucketFinder.show((bucket, profile) => {
+
+            setBucketCopyDialog({
+                open: true,
+                source: {
+                    bucket: params.row.Name,
+                    profile: mountedProfile
+                },
+                dest: {
+                    bucket: bucket,
+                    profile: profile
+                },
+                isSync: true
+            })
+        });
+
     };
 
     const handleDeleteBucket = (params) => {
 
         layout.confirm({
-            title: "حذف صندوقچه",
+            title: "Delete bucket",
             content: (
                 <span>
-                    آیا از حذف صندوقچه {params.row.Name} مطمئن هستید؟
+                    Are you sure you want to delete the {params.row.Name} bucket?
                 </span>
             ),
             onConfirm: async () => {
@@ -113,7 +131,7 @@ const BucketsList = () => {
 
                     await window.channel("Buckets@deleteBucket", mountedProfile, params.row.Name);
 
-                    layout.notify("صندوقچه مورد نظر با موفقیت حذف شد", {
+                    layout.notify("Bucket deleted successfully", {
                         severity: "success"
                     });
 
@@ -125,18 +143,52 @@ const BucketsList = () => {
                     console.log(e);
 
                     if(e.Code === "BucketNotEmpty"){
-                        layout.notify("امکان حذف صندوقچه وجود ندارد. لطفا ابتدا تمام فایل های صندوقچه را حذف کنید و سپس اقدام به حذف صندوقچه نمایید.", {
+                        layout.notify("It is not possible to delete the bucket. Please delete all the objects in the bucket first and then proceed to delete the bucket.", {
                             severity: "error"
                         });
                     }
                     else{
-                        layout.notify("خطا در حذف صندوقچه", {
+                        layout.notify("Error in deleting the bucket", {
                             severity: "error"
                         });
                     }
                 }
             }
         });
+    };
+
+    const handleChangeAcl = async (params, e) => {
+
+        const isPublic = e.target.checked;
+
+        try{
+
+            await window.channel("Buckets@setBucketIsPublic", mountedProfile, params.row.Name, isPublic);
+
+            const index = buckets.findIndex((bucket) => bucket.id === params.id);
+
+            buckets[index].IsPublic = isPublic;
+            setBuckets(buckets);
+
+            // const updatedBucket = { ...buckets[index], IsPublic: isPublic };
+            //
+            // setBuckets([...buckets.map((row) => (row.id === updatedBucket.id ? updatedBucket : row))]);
+
+            layout.notify("The access level of the bucket has been successfully updated", {
+                severity: "success"
+            });
+
+
+        }
+        catch (e) {
+
+            console.log(e);
+
+            layout.notify("Error in changing the access level of the bucket", {
+                severity: "error"
+            });
+        }
+
     };
 
     const handleShowObjects = (bucket) => {
@@ -157,7 +209,7 @@ const BucketsList = () => {
 
     function getCreationDateAttribute(params) {
 
-        return moment(params.value).locale('fa').format('DD MMMM YYYY - HH:mm');
+        return moment(params.value).locale('en').format('DD MMMM YYYY - HH:mm');
     }
 
     const columns = [
@@ -168,18 +220,18 @@ const BucketsList = () => {
             renderCell: (params) => {
 
                 return (
-                    <span>{params.api.getRowIndex(params.row.id) + 1}</span>
+                    <span className="row-index mouse-pointer" onClick={handleShowObjects.bind(this, params.id)}>{params.api.getRowIndex(params.row.id) + 1}</span>
                 )
             },
             width: 50,
         },
         {
             field: 'Name',
-            headerName: 'نام صندوقچه',
+            headerName: 'Bucket',
             renderCell: (params) => {
 
                 return (
-                    <span onClick={handleShowObjects.bind(this, params.id)}>{params.row.Name}</span>
+                    <span className="mouse-pointer" onClick={handleShowObjects.bind(this, params.id)}>{params.row.Name}</span>
                 )
             },
             //maxWidth: 400,
@@ -190,19 +242,19 @@ const BucketsList = () => {
             field: 'CreationDate',
             type: 'datetime',
             valueFormatter: getCreationDateAttribute,
-            headerName: 'تاریخ ساخت',
-            width: 150,
+            headerName: 'Creation date',
+            width: 220,
             align: 'center',
             headerAlign: 'center',
 
         },
         {
-            field: 'Acl',
+            field: 'IsPublic',
             type: 'boolean',
-            headerName: 'نمایش عمومی',
+            headerName: 'Public read',
             renderCell: (params) => {
                 return (
-                    <Switch/>
+                    <Switch checked={params.row.IsPublic} onChange={handleChangeAcl.bind(this, params)} />
                 )
             },
             width: 150,
@@ -216,25 +268,25 @@ const BucketsList = () => {
                         <ListItemIcon>
                             <FolderCopyIcon fontSize="small" />
                         </ListItemIcon>
-                        <ListItemText>کپی</ListItemText>
+                        <ListItemText>Copy bucket</ListItemText>
                     </MenuItem>
                     <MenuItem onClick={handleSyncBucket.bind(this, params)}>
                         <ListItemIcon>
                             <CloudSyncIcon fontSize="small" />
                         </ListItemIcon>
-                        <ListItemText>سینک</ListItemText>
+                        <ListItemText>Sync bucket</ListItemText>
                     </MenuItem>
                     <MenuItem onClick={handleDeleteBucket.bind(this, params)}>
                         <ListItemIcon>
                             <DeleteIcon fontSize="small" />
                         </ListItemIcon>
-                        <ListItemText>حذف</ListItemText>
+                        <ListItemText>Delete bucket</ListItemText>
                     </MenuItem>
                 </ActionMenu>
             ),
             headerName: '',
             align: 'center',
-            width: 122,
+            width: 150,
         }
     ];
 
@@ -244,9 +296,9 @@ const BucketsList = () => {
             <Stack direction="row" justifyContent="space-between" sx={{marginBottom: '1rem'}}>
                 <div>
                     <IconButton onClick={handleBackToProfiles}><BackIcon fontSize="small" /></IconButton>
-                    <span style={{fontSize: '16px', fontWeight: '700'}}>لیست صندوقچه ها</span>
+                    <span style={{fontSize: '16px', fontWeight: '700'}}>Buckets</span>
                 </div>
-                <Button onClick={() => setBucketCreateDialog({open: true})} variant="contained" startIcon={<BucketIcon />}>ایجاد صندوقچه</Button>
+                <Button onClick={() => setBucketCreateDialog({open: true})} variant="contained" startIcon={<BucketIcon />}>Add bucket</Button>
             </Stack>
 
 
@@ -275,6 +327,7 @@ const BucketsList = () => {
                     disableSelectionOnClick={true}
                     onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
                     columns={columns}
+                    loading={loading}
                     rows={buckets}
                 />
             }

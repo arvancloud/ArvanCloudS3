@@ -6,17 +6,19 @@ import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
 import LayoutContext from "../../contexts/LayoutContext";
 import Stack from "@mui/material/Stack";
-import LinearProgress from "@mui/material/LinearProgress";
+import ProgressBar from "../../components/ProgressBar/ProgressBar";
 
 export default function BucketCopyDialog (props) {
 
     const layout = React.useContext(LayoutContext);
 
-    const {open, onClose, source, dest} = props;
+    const {open, onClose, source, dest, isSync} = props;
+
+    const operationName = isSync ? "Syncing" : "Copying";
 
     const [progress , setProgress] = React.useState({
         mainProgress: 0,
-        mainTotal: null,
+        mainTotal: "∞",
         mainPercent: 0,
         objectKey: null,
         objectPercent: 0
@@ -24,7 +26,19 @@ export default function BucketCopyDialog (props) {
 
     const [processing, setProcessing] = React.useState(false);
 
+    const [isFinish, setIsFinish] = React.useState(false);
+
     React.useEffect(() => {
+
+        setProcessing(false);
+        setIsFinish(false);
+        setProgress({
+            mainProgress: 0,
+            mainTotal: "∞",
+            mainPercent: 0,
+            objectKey: null,
+            objectPercent: 0
+        });
 
         window.ipcRenderer.on('copyBucket@progress', (event, data) => {
             setProgress(data);
@@ -32,17 +46,18 @@ export default function BucketCopyDialog (props) {
 
         window.ipcRenderer.on('copyBucket@end', (event) => {
 
-            layout.notify("کپی صندوقچه با موفقیت انجام شد", {
+            layout.notify(`${operationName} bucket done`, {
                 severity: "success"
             });
 
             setProcessing(false);
+            setIsFinish(true);
 
         });
 
         window.ipcRenderer.on('copyBucket@abort', (event) => {
 
-            layout.notify("کپی صندوقچه متوقف شد", {
+            layout.notify(`${operationName} bucket stopped`, {
                 severity: "warning"
             });
 
@@ -54,7 +69,7 @@ export default function BucketCopyDialog (props) {
 
             console.log(e);
 
-            layout.notify("خطا در کپی صندوقچه", {
+            layout.notify(`Error in ${operationName} the bucket `, {
                 severity: "error"
             });
 
@@ -62,26 +77,32 @@ export default function BucketCopyDialog (props) {
 
         });
 
-    }, []);
+    }, [open]);
 
     const handleCopyBucket = async () => {
 
-        try{
+        if(isFinish){
+            onClose();
+        }
+        else{
 
-            setProcessing(true);
+            try{
 
-            await window.channel("Buckets@copyBucket", source.profile, source.bucket, dest.profile, dest.bucket);
+                setProcessing(true);
+
+                await window.channel(isSync ? "Buckets@syncBucket" : "Buckets@copyBucket" , source.profile, source.bucket, dest.profile, dest.bucket);
+
+            }
+            catch (e) {
+
+                console.log(e);
+
+                layout.notify(`Error in ${operationName} the bucket `, {
+                    severity: "error"
+                });
+            }
 
         }
-        catch (e) {
-
-            console.log(e);
-
-            layout.notify("خطا در کپی صندوقچه", {
-                severity: "error"
-            });
-        }
-
     }
 
     const handleCancelOperation = async () => {
@@ -93,40 +114,37 @@ export default function BucketCopyDialog (props) {
     };
 
     return (
-        <Dialog open={open}>
-            <DialogTitle>کپی کردن فایل های یک صندوقچه</DialogTitle>
+        <Dialog open={open} fullWidth>
+            <DialogTitle>{operationName} files of a bucket</DialogTitle>
             {
                 open &&
                 <DialogContent>
-                    <Stack direction="row" spacing={2}>
+                    <Stack direction="row" spacing={2} justifyContent="space-between" style={{textAlign: "center"}}>
                         <div>
-                            <h3>باکت مبدا</h3>
-                            <h4>{source.bucket}</h4>
-                            <h4>{source.profile.title}</h4>
+                            <span style={{color: '#7a90aa'}}>Source bucket</span>
+                            <h2 style={{color: '#00baba'}}>{source.bucket}</h2>
+                            <h5 style={{color: '#bbb'}}>{source.profile.title}</h5>
                         </div>
                         <div>
-                            <h3>باکت مقصد</h3>
-                            <h4>{dest.bucket}</h4>
-                            <h4>{dest.profile.title}</h4>
+                            <span style={{color: '#7a90aa'}}>Destination bucket</span>
+                            <h2 style={{color: '#00baba'}}>{dest.bucket}</h2>
+                            <h5 style={{color: '#bbb'}}>{dest.profile.title}</h5>
                         </div>
                     </Stack>
-                    <Stack spacing={2}>
-                        <div>
-                            <h6>{progress.mainProgress} / {progress.mainTotal}</h6>
-                            <h5>{progress.mainPercent}%</h5>
-                            <LinearProgress variant="determinate" value={progress.mainPercent} />
-                        </div>
-                        <div>
-                            <h6>{progress.objectKey}</h6>
-                            <h5>{progress.objectPercent}%</h5>
-                            <LinearProgress variant="determinate" value={progress.objectPercent} />
-                        </div>
+                    <Stack spacing={2} style={{marginTop: '2rem'}}>
+                        <ProgressBar percent={progress.mainPercent}>
+                            <span>{progress.mainProgress} from {progress.mainTotal}</span>
+                        </ProgressBar>
+
+                        <ProgressBar percent={progress.objectPercent}>
+                            <span style={{direction: "ltr"}}>{progress.objectKey}</span>
+                        </ProgressBar>
                     </Stack>
                 </DialogContent>
             }
             <DialogActions>
-                <Button variant="outlined" onClick={handleCancelOperation}>{processing ? "توقف" : "انصراف"}</Button>
-                <Button variant="contained" disabled={processing} onClick={handleCopyBucket}>کپی شود</Button>
+                <Button color="secondary" variant="outlined" disabled={isFinish} onClick={handleCancelOperation}>{processing ? "Stop" : "Cancel"}</Button>
+                <Button variant="contained"  disabled={processing} onClick={handleCopyBucket}>{isFinish ? "End" : (isSync ? "Sync" : "Copy")}</Button>
             </DialogActions>
         </Dialog>
     );
