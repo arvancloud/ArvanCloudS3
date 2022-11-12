@@ -25,7 +25,10 @@ function DataGrid(props) {
                     },
                     ".Mui-checked": {
                         color: "primary.main"
-                    }
+                    },
+                    "&.Mui-disabled": {
+                        color: "#f1f5fd"
+                    },
                 },
                 "& .MuiDataGrid-virtualScroller": {
                     overflow: "hidden"

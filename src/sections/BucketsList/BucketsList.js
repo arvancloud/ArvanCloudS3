@@ -17,6 +17,7 @@ import ListItemText from "@mui/material/ListItemText";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import DeleteIcon from '@mui/icons-material/Delete';
 import FolderCopyIcon from '@mui/icons-material/FolderCopy';
+import FolderIcon from '@mui/icons-material/Folder';
 import CloudSyncIcon from '@mui/icons-material/CloudSync';
 
 const BucketsList = () => {
@@ -198,6 +199,20 @@ const BucketsList = () => {
             state: {
                 mountedProfile: mountedProfile,
                 mountedBucket: bucket,
+                directoryMode: false,
+            }
+        });
+
+    };
+
+    const handleShowDirectories = (bucket) => {
+
+        navigate("/objects", {
+            replace: true,
+            state: {
+                mountedProfile: mountedProfile,
+                mountedBucket: bucket,
+                directoryMode: true,
             }
         });
 
@@ -264,6 +279,12 @@ const BucketsList = () => {
             sortable: false,
             renderCell: (params) => (
                 <ActionMenu>
+                    <MenuItem onClick={handleShowDirectories.bind(this, params.id)}>
+                        <ListItemIcon>
+                            <FolderIcon fontSize="small" />
+                        </ListItemIcon>
+                        <ListItemText>Show directories</ListItemText>
+                    </MenuItem>
                     <MenuItem onClick={handleCopyBucket.bind(this, params)}>
                         <ListItemIcon>
                             <FolderCopyIcon fontSize="small" />

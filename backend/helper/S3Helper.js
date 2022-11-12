@@ -191,8 +191,10 @@ module.exports.putObjectInBucketMultiPart = (s3, bucketName, filePath, objectKey
 module.exports.getAllObjects = async (s3, bucketName) => {
 
     const data = await s3.send(new ListObjectsCommand({
-        Bucket: bucketName
+        Bucket: bucketName,
     }));
+
+    //console.log(data);
 
     let objects = data.Contents ? data.Contents : [];
     let nextMarker = data.NextMarker;
@@ -213,6 +215,37 @@ module.exports.getAllObjects = async (s3, bucketName) => {
     }
 
     return objects;
+
+};
+
+module.exports.getAllObjectsByDirectory = async (s3, bucketName, prefix) => {
+
+    const data = await s3.send(new ListObjectsCommand({
+        Bucket: bucketName,
+        Delimiter: "/",
+        Prefix: prefix,
+    }));
+
+    console.log(data);
+
+    let folders = data.CommonPrefixes ? data.CommonPrefixes : [];
+
+    let objects = data.Contents ? data.Contents : [];
+    let nextMarker = data.NextMarker;
+
+    while (nextMarker){
+
+        const data = await s3.send(new ListObjectsCommand({
+            Bucket: bucketName,
+            Marker: nextMarker
+        }));
+
+        objects = objects.concat(data.Contents);
+        nextMarker = data.NextMarker;
+
+    }
+
+    return folders.concat(objects);
 
 };
 
