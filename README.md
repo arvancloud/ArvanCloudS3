@@ -64,6 +64,8 @@ For run the project on production mode:
 - Download proportional version and extract
     - Current link: https://github.com/electron/electron/releases/download/v19.0.9/electron-v19.0.9-win32-x64.zip
 - Directory of project must be place in **resource/app**
+- **rclone** folder must be place in root, Where the electron.exe is located
+- `rclone/rclone-config.cong` must be delete if exist
 - Run electron.exe
 - Package the project with a installer software such as **Advanced Installer**
 

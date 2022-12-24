@@ -22,7 +22,6 @@ class ObjectsChannel extends Channel {
                 GlobalData.CurrentBucketObjects = await S3Helper.getAllObjects(s3, bucketName);
             }
 
-            //console.log("load object from s3")
         }
 
         const start = queryOptions.page * queryOptions.pageSize;
@@ -85,7 +84,7 @@ class ObjectsChannel extends Channel {
 
         await s3.send(new DeleteObjectCommand({
             Bucket: bucketName,
-            Key: objectKey,
+            Key: objectKey
         }));
 
     }
@@ -113,7 +112,7 @@ class ObjectsChannel extends Channel {
             new PutObjectAclCommand({
                 Bucket: bucketName,
                 Key: objectKey,
-                ACL: isPublic ? 'public-read' : 'private',
+                ACL: isPublic ? 'public-read' : 'private'
             })
         );
 
@@ -129,7 +128,7 @@ class ObjectsChannel extends Channel {
                 new PutObjectAclCommand({
                     Bucket: bucketName,
                     Key: objectKeys[i],
-                    ACL: isPublic ? 'public-read' : 'private',
+                    ACL: isPublic ? 'public-read' : 'private'
                 })
             );
 
@@ -196,9 +195,6 @@ class ObjectsChannel extends Channel {
 
             let objectPath = path.resolve(downloadPath, objectKeys[i]);
             let objectDir = path.resolve(downloadPath, objectKeys[i], "..");
-
-            console.log(objectPath);
-            console.log(objectDir);
 
             await fs.ensureDir(objectDir);
 

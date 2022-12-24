@@ -18,8 +18,21 @@ const { v4: uuidv4 } = require('uuid');
 
 module.exports.getS3 = (profile) => {
 
+    let region = "default";
+
+    if(profile.provider === "other"){
+        let temp_url = profile
+            .endpoint_url
+            .trim()
+            .replace("https://s3.", "")
+            .replace("http://s3.", "");
+
+        region = temp_url.substring(0, temp_url.indexOf("."));
+
+    }
+
     return new S3Client({
-        region: 'default',
+        region: region,
         endpoint: profile.endpoint_url,
         credentials: {
             accessKeyId: profile.access_key,
@@ -135,7 +148,7 @@ module.exports.putObjectInBucketMultiPart = (s3, bucketName, filePath, objectKey
                             Bucket: bucketName,
                             Key: objectKey,
                             PartNumber: String(partNum),
-                            UploadId: UploadId,
+                            UploadId: UploadId
                         }));
 
                         multipartMap.Parts[partNum - 1] = {
@@ -170,7 +183,7 @@ module.exports.putObjectInBucketMultiPart = (s3, bucketName, filePath, objectKey
                 Bucket: bucketName,
                 Key: objectKey,
                 MultipartUpload: multipartMap,
-                UploadId: UploadId,
+                UploadId: UploadId
             }));
 
             let delta = (new Date() - startTime) / 1000;
@@ -191,26 +204,22 @@ module.exports.putObjectInBucketMultiPart = (s3, bucketName, filePath, objectKey
 module.exports.getAllObjects = async (s3, bucketName) => {
 
     const data = await s3.send(new ListObjectsCommand({
-        Bucket: bucketName,
+        Bucket: bucketName
     }));
 
-    //console.log(data);
-
     let objects = data.Contents ? data.Contents : [];
-    let nextMarker = data.NextMarker;
 
     //console.log("IsTruncated", data.IsTruncated);
     // IsTruncated == true means exists objects still
 
-    while (nextMarker){
+    while (data.NextMarker){
 
         const data = await s3.send(new ListObjectsCommand({
             Bucket: bucketName,
-            Marker: nextMarker
+            Marker: data.NextMarker
         }));
 
         objects = objects.concat(data.Contents);
-        nextMarker = data.NextMarker;
 
     }
 
@@ -223,25 +232,21 @@ module.exports.getAllObjectsByDirectory = async (s3, bucketName, prefix) => {
     const data = await s3.send(new ListObjectsCommand({
         Bucket: bucketName,
         Delimiter: "/",
-        Prefix: prefix,
+        Prefix: prefix
     }));
-
-    console.log(data);
 
     let folders = data.CommonPrefixes ? data.CommonPrefixes : [];
 
     let objects = data.Contents ? data.Contents : [];
-    let nextMarker = data.NextMarker;
 
-    while (nextMarker){
+    while (data.NextMarker){
 
         const data = await s3.send(new ListObjectsCommand({
             Bucket: bucketName,
-            Marker: nextMarker
+            Marker: data.NextMarker
         }));
 
         objects = objects.concat(data.Contents);
-        nextMarker = data.NextMarker;
 
     }
 

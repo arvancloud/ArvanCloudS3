@@ -2,6 +2,7 @@ const Channel = Router.resolve('core/Channel');
 const {ListBucketsCommand, CreateBucketCommand, DeleteBucketCommand, PutBucketAclCommand} = require('@aws-sdk/client-s3');
 const S3Helper = Router.resolve('helper/S3Helper');
 const fs = require("fs-extra");
+const {spawn} = require('child_process');
 
 class BucketsChannel extends Channel {
 
@@ -43,7 +44,7 @@ class BucketsChannel extends Channel {
         const data = await s3.send(
             new CreateBucketCommand({
                 Bucket: bucketName,
-                ACL: acl, // 'private' | 'public-read'
+                ACL: acl // 'private' | 'public-read'
             })
         );
 
@@ -64,7 +65,7 @@ class BucketsChannel extends Channel {
         const response = await s3.send(
             new PutBucketAclCommand({
                 Bucket: bucketName,
-                ACL: isPublic ? 'public-read' : 'private',
+                ACL: isPublic ? 'public-read' : 'private'
             })
         );
 
@@ -338,6 +339,66 @@ class BucketsChannel extends Channel {
     async cancelOperation() {
 
         GlobalData.AbortSignal = true;
+
+    }
+
+    async mountBucket(profile, bucketName){
+
+        let temp_url = profile
+            .endpoint_url
+            .trim()
+            .replace("https://s3.", "")
+            .replace("http://s3.", "");
+
+        let region = temp_url.substring(0, temp_url.indexOf("."));
+
+        let config = `
+[s3]
+type = s3
+provider = Other
+access_key_id = ${profile.access_key}
+secret_access_key = ${profile.secret_key}
+region = ${region}
+endpoint = ${profile.endpoint_url}
+storage_class = STANDARD`;
+
+        await fs.writeFile("rclone/rclone-config.conf", config);
+
+        if(GlobalData.RClone){
+            GlobalData.RClone.kill();
+        }
+
+        return await new Promise((resolve, reject) => {
+
+            GlobalData.RClone = spawn('rclone\\rclone', ['mount', 's3:' + bucketName, 'S:', '--vfs-cache-mode', 'full'], {
+                env: {
+                    ...process.env,
+                    RCLONE_CONFIG: "rclone\\rclone-config.conf"
+                }
+            });
+
+            // GlobalData.RClone.stdout.on('data', (data) => {
+            //     console.log(`stdout: ${data}`);
+            // });
+
+            GlobalData.RClone.stderr.on('data', (data) => {
+
+                if(`${data}`.trim() == `The service rclone has been started.`){
+                    resolve();
+                }
+                else{
+                    reject(`${data}`);
+                    // first data buffer reject and for more details log here
+                    console.log(`stderr: ${data}`);
+                }
+
+            });
+
+            // GlobalData.RClone.on('close', (code) => {
+            //     console.log(`child process exited with code ${code}`);
+            // });
+
+        });
 
     }
 }

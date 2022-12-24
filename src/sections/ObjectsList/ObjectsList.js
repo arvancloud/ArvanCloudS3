@@ -107,19 +107,15 @@ const ObjectsList = () => {
     React.useEffect(() => {
 
         if(objects !== null){
-            console.log("change query");
 
             loadObjects(false);
         }
-
-        console.log(queryOptions);
 
     }, [queryOptions]);
 
     React.useEffect(() => {
 
         if(objects !== null){
-            console.log("change prefix");
 
             loadObjects(true);
         }
