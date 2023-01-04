@@ -8,40 +8,64 @@ const { dialog } = require('electron');
 
 class ObjectsChannel extends Channel {
 
-    async getObjectsPro(profile, bucketName, queryOptions, clearCache){
+    async getObjectsPro(profile, bucketName, queryOptions, directory, clearCache){
 
         const s3 = S3Helper.getS3(profile);
 
         if(clearCache){
             GlobalData.CurrentBucketObjects = [];
-            GlobalData.CurrentBucketObjects = await S3Helper.getAllObjects(s3, bucketName);
-            //console.log("load object from s3")
+
+            if(directory.directoryMode === true){
+                GlobalData.CurrentBucketObjects = await S3Helper.getAllObjectsByDirectory(s3, bucketName, directory.prefix);
+            }
+            else{
+                GlobalData.CurrentBucketObjects = await S3Helper.getAllObjects(s3, bucketName);
+            }
+
         }
 
         const start = queryOptions.page * queryOptions.pageSize;
         const end = (queryOptions.page + 1) * queryOptions.pageSize;
 
         let objects;
+        let filter = null;
+        if(queryOptions.searchKey){
+            filter = function (object) {
+                return (object.Key && object.Key.indexOf(queryOptions.searchKey) >= 0) || (object.Prefix && object.Prefix.indexOf(queryOptions.searchKey) >= 0);
+            };
+        }
 
         if(queryOptions.sort.length > 0){
 
             if(queryOptions.sort[0].sort === "desc"){
-                objects = GlobalData.CurrentBucketObjects.sortBy(queryOptions.sort[0].field).reverse().slice(start, end);
+                objects = GlobalData.CurrentBucketObjects.filter(filter).sortBy(queryOptions.sort[0].field).reverse().slice(start, end);
             }
             else{
-                objects = GlobalData.CurrentBucketObjects.sortBy(queryOptions.sort[0].field).slice(start, end);
+                objects = GlobalData.CurrentBucketObjects.filter(filter).sortBy(queryOptions.sort[0].field).slice(start, end);
             }
         }
         else{
 
-            objects = GlobalData.CurrentBucketObjects.slice(start, end);
+            objects = GlobalData.CurrentBucketObjects.filter(filter).slice(start, end);
 
         }
 
         await Promise.all(objects.map(async (object) => {
 
-            object.IsPublic = await S3Helper.isPublicObject(s3, bucketName, object.Key);
-            object.id = object.Key;
+            if(object.Prefix){
+
+                object.IsPublic = false;
+                object.id = object.Prefix;
+                object.Key = object.Prefix;
+                object.IsFolder = true;
+
+            }
+            else{
+
+                object.IsPublic = await S3Helper.isPublicObject(s3, bucketName, object.Key);
+                object.id = object.Key;
+                object.IsFolder = false;
+            }
 
             return object;
 
@@ -60,7 +84,7 @@ class ObjectsChannel extends Channel {
 
         await s3.send(new DeleteObjectCommand({
             Bucket: bucketName,
-            Key: objectKey,
+            Key: objectKey
         }));
 
     }
@@ -88,7 +112,7 @@ class ObjectsChannel extends Channel {
             new PutObjectAclCommand({
                 Bucket: bucketName,
                 Key: objectKey,
-                ACL: isPublic ? 'public-read' : 'private',
+                ACL: isPublic ? 'public-read' : 'private'
             })
         );
 
@@ -104,7 +128,7 @@ class ObjectsChannel extends Channel {
                 new PutObjectAclCommand({
                     Bucket: bucketName,
                     Key: objectKeys[i],
-                    ACL: isPublic ? 'public-read' : 'private',
+                    ACL: isPublic ? 'public-read' : 'private'
                 })
             );
 
@@ -171,9 +195,6 @@ class ObjectsChannel extends Channel {
 
             let objectPath = path.resolve(downloadPath, objectKeys[i]);
             let objectDir = path.resolve(downloadPath, objectKeys[i], "..");
-
-            console.log(objectPath);
-            console.log(objectDir);
 
             await fs.ensureDir(objectDir);
 

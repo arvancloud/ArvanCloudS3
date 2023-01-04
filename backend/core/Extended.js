@@ -11,6 +11,18 @@ Array.prototype.max = function (iteratee) {
 
 };
 
+Array.prototype.filter = function (predicate) {
+
+    if(predicate){
+        return _.filter(this, predicate)
+    }
+    else{
+        return this;
+    }
+
+
+};
+
 Array.prototype.sortBy = function (iteratee) {
 
     return _.sortBy(this, iteratee)

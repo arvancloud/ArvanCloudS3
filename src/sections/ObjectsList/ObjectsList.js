@@ -20,6 +20,11 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import CloudDownloadOutlinedIcon from '@mui/icons-material/CloudDownloadOutlined';
 import PublicIcon from '@mui/icons-material/Public';
 import PublicOffIcon from '@mui/icons-material/PublicOff';
+import TextField from "../../components/TextField/TextField";
+import FolderIcon from '@mui/icons-material/Folder';
+import HomeIcon from '@mui/icons-material/Home';
+import Breadcrumbs from "@mui/material/Breadcrumbs";
+import Link from "@mui/material/Link";
 
 const ObjectsList = () => {
 
@@ -29,6 +34,7 @@ const ObjectsList = () => {
 
     const mountedProfile = location.state.mountedProfile;
     const mountedBucket = location.state.mountedBucket;
+    const directoryMode = location.state.directoryMode;
 
     const [rowCount, setRowCount] = React.useState(0);
     const [pageSize, setPageSize] = React.useState(5);
@@ -39,14 +45,17 @@ const ObjectsList = () => {
     const [goUploadDialog, setGoUploadDialog] = React.useState({open: false, data: {}});
     const [selectionModel, setSelectionModel] = React.useState([]);
     const [sort, setSort] = React.useState([]);
+    const [searchKey, setSearchKey] = React.useState("");
+    const [prefix, setPrefix] = React.useState("");
 
     const queryOptions = React.useMemo(
         () => ({
             page,
             pageSize,
-            sort
+            sort,
+            searchKey
         }),
-        [page, pageSize, sort],
+        [page, pageSize, sort, searchKey],
     );
 
     const loadObjects = async(clearCache = true) => {
@@ -60,7 +69,7 @@ const ObjectsList = () => {
 
 
         try{
-            const data = await window.channel("Objects@getObjectsPro", mountedProfile, mountedBucket, queryOptions, clearCache);
+            const data = await window.channel("Objects@getObjectsPro", mountedProfile, mountedBucket, queryOptions, {directoryMode, prefix}, clearCache);
 
             setRowCount(data.count);
 
@@ -98,18 +107,32 @@ const ObjectsList = () => {
     React.useEffect(() => {
 
         if(objects !== null){
-            console.log("change query");
 
             loadObjects(false);
         }
 
     }, [queryOptions]);
 
+    React.useEffect(() => {
+
+        if(objects !== null){
+
+            loadObjects(true);
+        }
+
+    }, [prefix]);
+
     const handleSortModelChange = React.useCallback((sortModel) => {
 
         setSort(sortModel);
 
     }, []);
+
+    const handleShowFolder = async (key) => {
+
+        setPrefix(key);
+
+    };
 
     const handleDownloadObject = async (params) => {
 
@@ -300,11 +323,15 @@ const ObjectsList = () => {
 
     function getLastModifiedAttribute(params) {
 
+        if(params.value === undefined) return '';
+
         return moment(params.value).locale('en').format('DD MMMM YYYY - HH:mm');
 
     }
 
     function getSizeAttribute(params) {
+
+        if(params.value === undefined) return '';
 
         let size = params.value;
 
@@ -331,14 +358,33 @@ const ObjectsList = () => {
         },
         {
             field: 'Key',
-            headerName: 'Object name',
-            // renderCell: (params) => {
-            //     console.log(params);
-            //     return (
-            //         <span onClick={handleShowObjects.bind(this, params.id)}>{params.row.Name}</span>
-            //     )
-            // },
+            headerName: directoryMode ? 'Path' : 'Object name',
+            renderCell: (params) => {
+                if(params.row.IsFolder){
+                    return (
+                        <span
+                            className="mouse-pointer"
+                            onClick={handleShowFolder.bind(this, params.row.Key)}
+                        >
+                            <FolderIcon
+                                color="primary"
+                                fontSize="small"
+                                sx={{
+                                    position: 'relative',
+                                    top: '4px',
+                                    left: '-3px'
+                                }}
+                            /> {params.row.Key.substr(prefix.length)}
+                        </span>
+                    )
+                }
+                else{
+                    return (
+                        <span>{params.row.Key.substr(prefix.length)}</span>
+                    )
+                }
 
+            },
             minWidth: 200,
             flex: 0.8,
         },
@@ -366,6 +412,9 @@ const ObjectsList = () => {
             headerName: 'Public read',
             type: 'boolean',
             renderCell: (params) => {
+
+                if(params.row.IsFolder) return "";
+
                 return (
                     <Switch checked={params.row.IsPublic} onChange={handleChangeAcl.bind(this, params)} />
                 )
@@ -376,20 +425,23 @@ const ObjectsList = () => {
             field: 'actions',
             sortable: false,
             renderCell: (params) => (
-                <ActionMenu>
-                    <MenuItem onClick={handleDownloadObject.bind(this, params)}>
-                        <ListItemIcon>
-                            <CloudDownloadOutlinedIcon fontSize="small" />
-                        </ListItemIcon>
-                        <ListItemText>Download object</ListItemText>
-                    </MenuItem>
-                    <MenuItem onClick={handleDeleteObject.bind(this, params)}>
-                        <ListItemIcon>
-                            <DeleteIcon fontSize="small" />
-                        </ListItemIcon>
-                        <ListItemText>Delete object</ListItemText>
-                    </MenuItem>
-                </ActionMenu>
+                <>{
+                    !params.row.IsFolder &&
+                    <ActionMenu>
+                        <MenuItem onClick={handleDownloadObject.bind(this, params)}>
+                            <ListItemIcon>
+                                <CloudDownloadOutlinedIcon fontSize="small" />
+                            </ListItemIcon>
+                            <ListItemText>Download object</ListItemText>
+                        </MenuItem>
+                        <MenuItem onClick={handleDeleteObject.bind(this, params)}>
+                            <ListItemIcon>
+                                <DeleteIcon fontSize="small" />
+                            </ListItemIcon>
+                            <ListItemText>Delete object</ListItemText>
+                        </MenuItem>
+                    </ActionMenu>
+                }</>
             ),
             headerName: '',
             align: 'center',
@@ -431,6 +483,20 @@ const ObjectsList = () => {
                         <ListItemText>Delete objects</ListItemText>
                     </MenuItem>
                 </ActionMenu>
+                <div style={{
+                    marginTop: '-40px',
+                }}>
+                    <TextField
+                        size="small"
+                        id="search-key"
+                        placeholder="Search..."
+                        type="text"
+                        name="search_key"
+                        value={searchKey}
+                        onChange={(e) => setSearchKey(e.target.value)}
+                    />
+                </div>
+
                 <Button onClick={() => setUploadBoxDialog({open: true})} variant="contained" startIcon={<CloudUploadIcon />}>Upload</Button>
             </Stack>
 
@@ -453,10 +519,38 @@ const ObjectsList = () => {
         </div>
     );
 
+    const FoldersBreadCrumb = () => {
+
+        let path = "";
+
+        return (
+            <Breadcrumbs aria-label="breadcrumb" color="primary" style={{marginLeft: '20px'}}>
+                <HomeIcon
+                    className="mouse-pointer"
+                    color="inherit"
+                    fontSize="small"
+                    onClick={handleShowFolder.bind(this, "")}
+                    sx={{
+                        position: 'relative',
+                        top: '3px',
+                    }}
+                />
+                {prefix.split("/").map((folder) => {
+
+                    path += folder + "/";
+
+                    return (<Link underline="none" className="mouse-pointer" onClick={handleShowFolder.bind(this, path)} color="inherit">{folder}</Link>);
+                })}
+            </Breadcrumbs>
+        );
+    };
+
     return (
         <div style={{width: '100%'}}>
 
             {ToolBar}
+
+            {directoryMode && <FoldersBreadCrumb />}
 
             {objects &&
 
@@ -479,6 +573,7 @@ const ObjectsList = () => {
                 rowCount={rowCount}
                 sortingMode="server"
                 onSortModelChange={handleSortModelChange}
+                isRowSelectable={(params) => !params.row.IsFolder}
             />
 
             }

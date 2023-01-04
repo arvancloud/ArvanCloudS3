@@ -28,3 +28,6 @@ yarn-error.log*
 
 # store
 /backend/store
+
+# rclone config
+/rclone/rclone-config.conf

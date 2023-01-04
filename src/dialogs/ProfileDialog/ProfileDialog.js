@@ -124,8 +124,8 @@ function ProfileDialog(props) {
                             value={inputField.endpoint_url}
                             onChange={handleInputs}
                         >
-                            <MenuItem value="https://s3.ir-thr-at1.arvanstorage.com">s3.ir-thr-at1.arvanstorage.com</MenuItem>
-                            <MenuItem value="https://s3.ir-tbz-sh1.arvanstorage.com">s3.ir-tbz-sh1.arvanstorage.com</MenuItem>
+                            <MenuItem value="https://s3.ir-thr-at1.arvanstorage.ir">s3.ir-thr-at1.arvanstorage.ir</MenuItem>
+                            <MenuItem value="https://s3.ir-tbz-sh1.arvanstorage.ir">s3.ir-tbz-sh1.arvanstorage.ir</MenuItem>
                         </TextField>
                 }
 
