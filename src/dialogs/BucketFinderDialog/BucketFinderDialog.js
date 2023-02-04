@@ -70,7 +70,7 @@ function BucketFinderDialog(props) {
     const handleSelectProfile = (profile) => async (event, isExpanded) => {
 
         try{
-            const buckets = await window.channel("Buckets@getBuckets", profile);
+            const buckets = await window.channel("Buckets@getBucketsWithAcl", profile);
 
             setSelectedProfile({...profile, buckets: buckets});
         }

@@ -9,6 +9,7 @@ const {
     GetObjectCommand,
     GetObjectAclCommand,
     GetBucketAclCommand,
+    CopyObjectCommand
 } = require('@aws-sdk/client-s3');
 
 const fs = require('fs-extra');
@@ -18,7 +19,8 @@ const { v4: uuidv4 } = require('uuid');
 
 module.exports.getS3 = (profile) => {
 
-    let region = "default";
+    var region = "default";
+    let secondEndPoint = "https://s3.ir-tbz-sh1.arvanstorage.ir";
 
     if(profile.provider === "other"){
         let temp_url = profile
@@ -30,8 +32,43 @@ module.exports.getS3 = (profile) => {
         region = temp_url.substring(0, temp_url.indexOf("."));
 
     }
+    else{
+        if(profile.endpoint_url == "https://s3.ir-tbz-sh1.arvanstorage.ir"){
+            secondEndPoint = "https://s3.ir-thr-at1.arvanstorage.ir";
+        }
+    }
+
+    /*
+
+    class MyS3Client extends S3Client {
+        send(command, options) {
+            return new Promise((resolve, reject) => {
+                super.send(command, options).then(resolve).catch((err) => {
+                    if(err.name == "301"){
+                        let s3 = new S3Client({
+                            region: region,
+                            endpoint: secondEndPoint,
+                            credentials: {
+                                accessKeyId: profile.access_key,
+                                secretAccessKey: profile.secret_key,
+                            },
+                        });
+
+                        s3.send(command, options).then(resolve).catch(reject);
+                    }
+                    else{
+                        reject(err);
+                    }
+                });
+            })
+
+        }
+    }
+    return new MyS3Client({
+    */
 
     return new S3Client({
+        disableHostPrefix: true,
         region: region,
         endpoint: profile.endpoint_url,
         credentials: {
@@ -56,6 +93,9 @@ module.exports.checkExistBucket = async (s3, bucketName) => {
             return  false;
         }
         else if(e.name === "403"){
+            return true;
+        }
+        else if(e.name === "301"){
             return true;
         }
 
@@ -208,18 +248,20 @@ module.exports.getAllObjects = async (s3, bucketName) => {
     }));
 
     let objects = data.Contents ? data.Contents : [];
+    let nextMarker = data.NextMarker;
 
     //console.log("IsTruncated", data.IsTruncated);
     // IsTruncated == true means exists objects still
 
-    while (data.NextMarker){
+    while (nextMarker){
 
         const data = await s3.send(new ListObjectsCommand({
             Bucket: bucketName,
-            Marker: data.NextMarker
+            Marker: nextMarker
         }));
 
         objects = objects.concat(data.Contents);
+        nextMarker = data.NextMarker;
 
     }
 
@@ -238,15 +280,17 @@ module.exports.getAllObjectsByDirectory = async (s3, bucketName, prefix) => {
     let folders = data.CommonPrefixes ? data.CommonPrefixes : [];
 
     let objects = data.Contents ? data.Contents : [];
+    let nextMarker = data.NextMarker;
 
-    while (data.NextMarker){
+    while (nextMarker){
 
         const data = await s3.send(new ListObjectsCommand({
             Bucket: bucketName,
-            Marker: data.NextMarker
+            Marker: nextMarker
         }));
 
         objects = objects.concat(data.Contents);
+        nextMarker = data.NextMarker;
 
     }
 
@@ -296,14 +340,37 @@ module.exports.isPublicObject = async (s3, bucketName, objectKey) => {
 
 };
 
-module.exports.isPublicBucket = async (s3, bucketName) => {
+module.exports.copyObject = async (s3, sourceBucketName, destBucketName, objectKey, isPublic) => {
 
     const response = await s3.send(
-        new GetBucketAclCommand({
-            Bucket: bucketName
+        new CopyObjectCommand({
+            Bucket: destBucketName,
+            CopySource: `/${sourceBucketName}/${objectKey}`,
+            Key: objectKey,
+            ACL: isPublic ? 'public-read' : 'private'
         })
     );
 
-    return response.Grants[0] ? response.Grants[0].Permission === "READ" : false;
+};
+
+module.exports.isPublicBucket = async (s3, bucketName) => {
+
+    try{
+        const response = await s3.send(
+            new GetBucketAclCommand({
+                Bucket: bucketName
+            })
+        );
+
+        return response.Grants[0] ? response.Grants[0].Permission === "READ" : false;
+    }
+    catch (e) {
+
+        if(e.name == "301"){
+            return null;
+        }
+
+        throw e;
+    }
 
 };

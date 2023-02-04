@@ -515,6 +515,7 @@ const ObjectsList = () => {
                 mountedProfile={mountedProfile}
                 bucketName={mountedBucket}
                 objectsData={goUploadDialog.data}
+                prefix={prefix}
             />
         </div>
     );

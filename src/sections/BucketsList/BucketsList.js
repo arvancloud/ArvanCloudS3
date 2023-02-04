@@ -16,6 +16,7 @@ import Stack from "@mui/material/Stack";
 import ListItemText from "@mui/material/ListItemText";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import DeleteIcon from '@mui/icons-material/Delete';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import FolderCopyIcon from '@mui/icons-material/FolderCopy';
 import FolderIcon from '@mui/icons-material/Folder';
 import CloudSyncIcon from '@mui/icons-material/CloudSync';
@@ -159,6 +160,43 @@ const BucketsList = () => {
         });
     };
 
+    const handleEmptyBucket = (params) => {
+
+        layout.confirm({
+            title: "Empty bucket",
+            content: (
+                <span>
+                    Are you sure you want to empty the {params.row.Name} bucket?
+                </span>
+            ),
+            onConfirm: async () => {
+
+                setLoading(true);
+
+                try{
+
+                    await window.channel("Buckets@emptyBucket", mountedProfile, params.row.Name);
+
+                    layout.notify("Bucket emptied successfully", {
+                        severity: "success"
+                    });
+
+                }
+                catch (e) {
+
+                    console.log(e);
+
+                    layout.notify("Error in emptying the bucket", {
+                        severity: "error"
+                    });
+
+                }
+
+                setLoading(false);
+            }
+        });
+    };
+
     const handleChangeAcl = async (params, e) => {
 
         const isPublic = e.target.checked;
@@ -267,7 +305,7 @@ const BucketsList = () => {
             renderCell: (params) => {
 
                 return (
-                    <span className="mouse-pointer" onClick={handleShowObjects.bind(this, params.id)}>{params.row.Name}</span>
+                    <span className="mouse-pointer" onClick={handleShowDirectories.bind(this, params.id)}>{params.row.Name}</span>
                 )
             },
             //maxWidth: 400,
@@ -300,19 +338,18 @@ const BucketsList = () => {
             sortable: false,
             renderCell: (params) => (
                 <ActionMenu>
-                    <MenuItem onClick={handleShowDirectories.bind(this, params.id)}>
+{/*                    <MenuItem onClick={handleShowObjects.bind(this, params.id)}>
                         <ListItemIcon>
                             <FolderIcon fontSize="small" />
                         </ListItemIcon>
-                        <ListItemText>Show directories</ListItemText>
-                    </MenuItem>
+                        <ListItemText>Show objects</ListItemText>
+                    </MenuItem>*/}
                     <MenuItem onClick={handleMountBucketAsDrive.bind(this, params)}>
                         <ListItemIcon>
                             <SaveIcon fontSize="small" />
                         </ListItemIcon>
                         <ListItemText>Mount as drive</ListItemText>
                     </MenuItem>
-
                     <MenuItem onClick={handleCopyBucket.bind(this, params)}>
                         <ListItemIcon>
                             <FolderCopyIcon fontSize="small" />
@@ -324,6 +361,12 @@ const BucketsList = () => {
                             <CloudSyncIcon fontSize="small" />
                         </ListItemIcon>
                         <ListItemText>Sync bucket</ListItemText>
+                    </MenuItem>
+                    <MenuItem onClick={handleEmptyBucket.bind(this, params)}>
+                        <ListItemIcon>
+                            <DeleteOutlineIcon fontSize="small" />
+                        </ListItemIcon>
+                        <ListItemText>Empty bucket</ListItemText>
                     </MenuItem>
                     <MenuItem onClick={handleDeleteBucket.bind(this, params)}>
                         <ListItemIcon>

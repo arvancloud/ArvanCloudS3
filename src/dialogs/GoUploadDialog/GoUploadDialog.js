@@ -13,7 +13,7 @@ export default function GoUploadDialog (props) {
 
     const layout = React.useContext(LayoutContext);
 
-    const {open, onClose, mountedProfile, bucketName, onFinish, objectsData} = props;
+    const {open, onClose, mountedProfile, bucketName, onFinish, objectsData, prefix} = props;
 
     const [progress , setProgress] = React.useState({
         mainProgress: 0,
@@ -102,7 +102,7 @@ export default function GoUploadDialog (props) {
 
                 setProcessing(true);
 
-                await window.channel("Objects@startUploadFiles", mountedProfile, bucketName, isPublic);
+                await window.channel("Objects@startUploadFiles", mountedProfile, bucketName, isPublic, prefix);
 
             }
             catch (e) {

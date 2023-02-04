@@ -132,6 +132,8 @@ function CreateWindow() {
 
                     let error = JSON.stringify(e);
 
+                    GlobalData.AppInProcess = false;
+
                     return [error, null];
                 }
 

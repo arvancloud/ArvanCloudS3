@@ -243,7 +243,7 @@ class ObjectsChannel extends Channel {
 
     }
 
-    async startUploadFiles(profile, bucketName, isPublic){
+    async startUploadFiles(profile, bucketName, isPublic, prefix = ""){
 
         GlobalData.AbortSignal = false;
         GlobalData.AppInProcess = true;
@@ -287,6 +287,8 @@ class ObjectsChannel extends Channel {
             objectPercent = 0;
             objectKey = sourceObjects[i].Key;
             objectIndex = i;
+
+            sourceObjects[i].Key = prefix + sourceObjects[i].Key;
 
             progress();
 
