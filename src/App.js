@@ -94,8 +94,8 @@ function App(){
                             padding: '1.5rem',
                             boxShadow: '0 4px 20px rgba(0,0,0, 0.03)',
                             borderRadius: '1rem',
-                            marginTop: '1.5rem',
-                            minHeight: 'calc(91vh - 1.5rem)'
+                            marginTop: '1rem',
+                            minHeight: 'calc(91vh - 1rem)'
                         }}>
                             <Routes>
                                 <Route path={"/profiles"} element={<ProfilesList/>}/>
