@@ -210,7 +210,7 @@ const ProfilesList = () => {
 
     const ToolBar = (
         <div>
-            <h3 style={{marginTop: '0'}}>Arvan S3</h3>
+            <h3 style={{marginTop: '0'}}>Arvan Cloud S3</h3>
             <Stack direction="row" justifyContent="space-between" sx={{marginBottom: '1rem'}}>
                 <div>
                     <span style={{fontSize: '16px', fontWeight: '700'}}>Profiles</span>

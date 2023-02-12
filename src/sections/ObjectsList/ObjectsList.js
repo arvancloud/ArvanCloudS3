@@ -457,34 +457,10 @@ const ObjectsList = () => {
                     <IconButton onClick={handleBackToBuckets}><BackIcon fontSize="small" /></IconButton>
                     <span style={{fontSize: '16px', fontWeight: '700'}}>Bucket {mountedBucket}</span>
                 </div>
-                <ActionMenu buttonTitle="Batch operation" disabled={!selectionModel.length}>
-                    <MenuItem onClick={handleBulkDownloadObjects}>
-                        <ListItemIcon>
-                            <CloudDownloadOutlinedIcon fontSize="small" />
-                        </ListItemIcon>
-                        <ListItemText>Download objects</ListItemText>
-                    </MenuItem>
-                    <MenuItem onClick={handleBulkSetPublic}>
-                        <ListItemIcon>
-                            <PublicIcon fontSize="small" />
-                        </ListItemIcon>
-                        <ListItemText>Access public read</ListItemText>
-                    </MenuItem>
-                    <MenuItem onClick={handleBulkSetPrivate}>
-                        <ListItemIcon>
-                            <PublicOffIcon fontSize="small" />
-                        </ListItemIcon>
-                        <ListItemText>Remove public read access</ListItemText>
-                    </MenuItem>
-                    <MenuItem onClick={handleBulkDeleteObjects}>
-                        <ListItemIcon>
-                            <DeleteIcon fontSize="small" />
-                        </ListItemIcon>
-                        <ListItemText>Delete objects</ListItemText>
-                    </MenuItem>
-                </ActionMenu>
+
                 <div style={{
                     marginTop: '-40px',
+                    marginLeft: '-120px'
                 }}>
                     <TextField
                         size="small"
@@ -496,8 +472,36 @@ const ObjectsList = () => {
                         onChange={(e) => setSearchKey(e.target.value)}
                     />
                 </div>
+                <Stack direction="row" justifyContent="space-between" sx={{gap: '1rem'}}>
+                    <ActionMenu  buttonTitle="Batch operation" disabled={!selectionModel.length}>
+                        <MenuItem onClick={handleBulkDownloadObjects}>
+                            <ListItemIcon>
+                                <CloudDownloadOutlinedIcon fontSize="small" />
+                            </ListItemIcon>
+                            <ListItemText>Download objects</ListItemText>
+                        </MenuItem>
+                        <MenuItem onClick={handleBulkSetPublic}>
+                            <ListItemIcon>
+                                <PublicIcon fontSize="small" />
+                            </ListItemIcon>
+                            <ListItemText>Access public read</ListItemText>
+                        </MenuItem>
+                        <MenuItem onClick={handleBulkSetPrivate}>
+                            <ListItemIcon>
+                                <PublicOffIcon fontSize="small" />
+                            </ListItemIcon>
+                            <ListItemText>Remove public read access</ListItemText>
+                        </MenuItem>
+                        <MenuItem onClick={handleBulkDeleteObjects}>
+                            <ListItemIcon>
+                                <DeleteIcon fontSize="small" />
+                            </ListItemIcon>
+                            <ListItemText>Delete objects</ListItemText>
+                        </MenuItem>
+                    </ActionMenu>
+                    <Button onClick={() => setUploadBoxDialog({open: true})} variant="contained" startIcon={<CloudUploadIcon />}>Upload</Button>
+                </Stack>
 
-                <Button onClick={() => setUploadBoxDialog({open: true})} variant="contained" startIcon={<CloudUploadIcon />}>Upload</Button>
             </Stack>
 
             <ObjectUploadBoxDialog

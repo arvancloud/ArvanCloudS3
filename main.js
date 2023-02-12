@@ -73,13 +73,19 @@ function CreateWindow() {
     // Create the browser window.
 
     mainWindow = new BrowserWindow({
-        width: 1024,
+        width: 1210,
         height: 768,
         minWidth: 1024,
         minHeight: 768,
+        maxWidth: 1210,
+        //maxHeight: 768,
         icon: path.join(__dirname, 'icon.png'),
         autoHideMenuBar: true,
-        show: false,
+        show: true,
+        maximizable: false,
+        frame: true,
+        movable: true,
+        transparent: false,
         webPreferences: {
             nodeIntegration: false,
             contextIsolation: false,
@@ -87,8 +93,8 @@ function CreateWindow() {
         }
     });
 
-    mainWindow.maximize();
-    mainWindow.show();
+    //mainWindow.maximize();
+    //mainWindow.show();
 
     mainWindow.on('close', async e => {
         e.preventDefault();

@@ -544,6 +544,13 @@ storage_class = STANDARD`;
         });
 
     }
+
+    async unMountBucket(){
+
+        if(GlobalData.RClone){
+            GlobalData.RClone.kill();
+        }
+    }
 }
 
 const instance = new BucketsChannel();

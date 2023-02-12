@@ -281,6 +281,28 @@ const BucketsList = () => {
 
     };
 
+    const handleUnMountBucket = async (params) => {
+
+        try{
+
+            await window.channel("Buckets@unMountBucket");
+
+            layout.notify(params.row.Name + " unmounted successfully", {
+                severity: "success"
+            });
+
+        }
+        catch (e) {
+
+            console.log(e);
+
+            layout.notify("Error in bucket unmount", {
+                severity: "error"
+            });
+        }
+
+    };
+
     function getCreationDateAttribute(params) {
 
         return moment(params.value).locale('en').format('DD MMMM YYYY - HH:mm');
@@ -349,6 +371,12 @@ const BucketsList = () => {
                             <SaveIcon fontSize="small" />
                         </ListItemIcon>
                         <ListItemText>Mount as drive</ListItemText>
+                    </MenuItem>
+                    <MenuItem onClick={handleUnMountBucket.bind(this, params)}>
+                        <ListItemIcon>
+                            <SaveIcon fontSize="small" />
+                        </ListItemIcon>
+                        <ListItemText>Unmount bucket</ListItemText>
                     </MenuItem>
                     <MenuItem onClick={handleCopyBucket.bind(this, params)}>
                         <ListItemIcon>
