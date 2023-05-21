@@ -163,7 +163,7 @@ const ObjectsList = () => {
     const handleDeleteObject = (params) => {
 
         layout.confirm({
-            title: "Delete object",
+            title: "Delete Object",
             content: (<>
                 <h3>Should {params.row.Key} be deleted?</h3>
                 <p>This object will be permanently removed from {mountedBucket}.</p>
@@ -174,7 +174,7 @@ const ObjectsList = () => {
 
                     await window.channel("Objects@deleteObject", mountedProfile, mountedBucket, params.row.Key);
 
-                    layout.notify("The object has been deleted successfully", {
+                    layout.notify("Object Deleted Successfully", {
                         severity: "success"
                     });
 
@@ -185,7 +185,7 @@ const ObjectsList = () => {
 
                     console.log(e);
 
-                    layout.notify("Error in deleting object", {
+                    layout.notify("Could not Delete the Object", {
                         severity: "error"
                     });
                 }
@@ -291,7 +291,7 @@ const ObjectsList = () => {
         layout.confirm({
             title: "Delete objects",
             content: (<>
-                <h3>Are you sure you want to delete the {selectionModel.length} files?</h3>
+                <h3>Are you sure you want to delete {selectionModel.length} files?</h3>
                 <p>These objects will be permanently removed from {mountedBucket}.</p>
             </>),
             onConfirm: async () => {
@@ -358,7 +358,8 @@ const ObjectsList = () => {
         },
         {
             field: 'Key',
-            headerName: directoryMode ? 'Path' : 'Object name',
+            // headerName: directoryMode ? 'Path' : 'Object name',
+            headerName: 'Name',
             renderCell: (params) => {
                 if(params.row.IsFolder){
                     return (
@@ -401,7 +402,7 @@ const ObjectsList = () => {
             field: 'LastModified',
             type: 'datetime',
             valueFormatter: getLastModifiedAttribute,
-            headerName: 'Last modified',
+            headerName: 'Last Modified',
             headerAlign: 'center',
             align: 'center',
             width: 200
@@ -409,7 +410,7 @@ const ObjectsList = () => {
         {
             field: 'IsPublic',
             sortable: false,
-            headerName: 'Public read',
+            headerName: 'Public Access',
             type: 'boolean',
             renderCell: (params) => {
 
@@ -419,7 +420,7 @@ const ObjectsList = () => {
                     <Switch checked={params.row.IsPublic} onChange={handleChangeAcl.bind(this, params)} />
                 )
             },
-            width: 100
+            width: 150
         },
         {
             field: 'actions',
@@ -432,19 +433,20 @@ const ObjectsList = () => {
                             <ListItemIcon>
                                 <CloudDownloadOutlinedIcon fontSize="small" />
                             </ListItemIcon>
-                            <ListItemText>Download object</ListItemText>
+                            <ListItemText>Download</ListItemText>
                         </MenuItem>
                         <MenuItem onClick={handleDeleteObject.bind(this, params)}>
                             <ListItemIcon>
                                 <DeleteIcon fontSize="small" />
                             </ListItemIcon>
-                            <ListItemText>Delete object</ListItemText>
+                            <ListItemText>Delete</ListItemText>
                         </MenuItem>
                     </ActionMenu>
                 }</>
             ),
-            headerName: '',
+            headerName: 'Actions',
             align: 'center',
+            headerAlign: 'center',
             width: 140
         }
     ];
@@ -455,7 +457,7 @@ const ObjectsList = () => {
             <Stack direction="row" justifyContent="space-between" sx={{marginBottom: '1rem'}}>
                 <div>
                     <IconButton onClick={handleBackToBuckets}><BackIcon fontSize="small" /></IconButton>
-                    <span style={{fontSize: '16px', fontWeight: '700'}}>Bucket {mountedBucket}</span>
+                    <span style={{fontSize: '16px', fontWeight: '700'}}>{mountedBucket}</span>
                 </div>
 
                 <div style={{
@@ -473,30 +475,30 @@ const ObjectsList = () => {
                     />
                 </div>
                 <Stack direction="row" justifyContent="space-between" sx={{gap: '1rem'}}>
-                    <ActionMenu  buttonTitle="Batch operation" disabled={!selectionModel.length}>
+                    <ActionMenu  buttonTitle="Batch Operations" disabled={!selectionModel.length}>
                         <MenuItem onClick={handleBulkDownloadObjects}>
                             <ListItemIcon>
                                 <CloudDownloadOutlinedIcon fontSize="small" />
                             </ListItemIcon>
-                            <ListItemText>Download objects</ListItemText>
+                            <ListItemText>Download</ListItemText>
                         </MenuItem>
                         <MenuItem onClick={handleBulkSetPublic}>
                             <ListItemIcon>
                                 <PublicIcon fontSize="small" />
                             </ListItemIcon>
-                            <ListItemText>Access public read</ListItemText>
+                            <ListItemText>Enable Public Access</ListItemText>
                         </MenuItem>
                         <MenuItem onClick={handleBulkSetPrivate}>
                             <ListItemIcon>
                                 <PublicOffIcon fontSize="small" />
                             </ListItemIcon>
-                            <ListItemText>Remove public read access</ListItemText>
+                            <ListItemText>Disable Public Access</ListItemText>
                         </MenuItem>
                         <MenuItem onClick={handleBulkDeleteObjects}>
                             <ListItemIcon>
                                 <DeleteIcon fontSize="small" />
                             </ListItemIcon>
-                            <ListItemText>Delete objects</ListItemText>
+                            <ListItemText>Delete</ListItemText>
                         </MenuItem>
                     </ActionMenu>
                     <Button onClick={() => setUploadBoxDialog({open: true})} variant="contained" startIcon={<CloudUploadIcon />}>Upload</Button>

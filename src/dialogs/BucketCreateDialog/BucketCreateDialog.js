@@ -80,7 +80,7 @@ export default function BucketCreateDialog (props) {
 
     return (
         <Dialog open={open} onClose={onClose} fullWidth>
-            <DialogTitle>Create bucket</DialogTitle>
+            <DialogTitle>Create a Bucket</DialogTitle>
             <DialogContent>
                 <Stack spacing={2} style={{fontSize: '14px'}}>
                     <TextField
@@ -88,9 +88,9 @@ export default function BucketCreateDialog (props) {
                         autoFocus
                         fullWidth
                         id="bucket-name"
-                        label="Bucket name"
+                        label="Name"
                         type="text"
-                        placeholder="The name should be unique"
+                        placeholder="Name should be unique"
                         name="Name"
                         helperText={validationError.Name}
                         value={inputField.Name}
@@ -98,7 +98,7 @@ export default function BucketCreateDialog (props) {
                         size="small"
                     />
                     <Stack direction="row" spacing={2} justifyContent="space-between" alignItems="center">
-                        <span>Public read access</span>
+                        <span>Public Access</span>
                         <Switch
                             id="bucket-acl"
                             name="ACL"

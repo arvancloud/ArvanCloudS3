@@ -125,7 +125,7 @@ const BucketsList = () => {
             title: "Delete bucket",
             content: (
                 <span>
-                    Are you sure you want to delete the {params.row.Name} bucket?
+                    Are you sure you want to delete {params.row.Name}?
                 </span>
             ),
             onConfirm: async () => {
@@ -166,7 +166,7 @@ const BucketsList = () => {
             title: "Empty bucket",
             content: (
                 <span>
-                    Are you sure you want to empty the {params.row.Name} bucket?
+                    Are you sure you want to empty {params.row.Name}?
                 </span>
             ),
             onConfirm: async () => {
@@ -323,7 +323,7 @@ const BucketsList = () => {
         },
         {
             field: 'Name',
-            headerName: 'Bucket',
+            headerName: 'Name',
             renderCell: (params) => {
 
                 return (
@@ -338,7 +338,7 @@ const BucketsList = () => {
             field: 'CreationDate',
             type: 'datetime',
             valueFormatter: getCreationDateAttribute,
-            headerName: 'Creation date',
+            headerName: 'Created at',
             width: 220,
             align: 'center',
             headerAlign: 'center',
@@ -347,7 +347,7 @@ const BucketsList = () => {
         {
             field: 'IsPublic',
             type: 'boolean',
-            headerName: 'Public read',
+            headerName: 'Public Access',
             renderCell: (params) => {
                 return (
                     <Switch checked={params.row.IsPublic} onChange={handleChangeAcl.bind(this, params)} />
@@ -370,42 +370,43 @@ const BucketsList = () => {
                         <ListItemIcon>
                             <SaveIcon fontSize="small" />
                         </ListItemIcon>
-                        <ListItemText>Mount as drive</ListItemText>
+                        <ListItemText>Mount as a Local Drive</ListItemText>
                     </MenuItem>
                     <MenuItem onClick={handleUnMountBucket.bind(this, params)}>
                         <ListItemIcon>
                             <SaveIcon fontSize="small" />
                         </ListItemIcon>
-                        <ListItemText>Unmount bucket</ListItemText>
+                        <ListItemText>Unmount</ListItemText>
                     </MenuItem>
                     <MenuItem onClick={handleCopyBucket.bind(this, params)}>
                         <ListItemIcon>
                             <FolderCopyIcon fontSize="small" />
                         </ListItemIcon>
-                        <ListItemText>Copy bucket</ListItemText>
+                        <ListItemText>Copy</ListItemText>
                     </MenuItem>
                     <MenuItem onClick={handleSyncBucket.bind(this, params)}>
                         <ListItemIcon>
                             <CloudSyncIcon fontSize="small" />
                         </ListItemIcon>
-                        <ListItemText>Sync bucket</ListItemText>
+                        <ListItemText>Sync</ListItemText>
                     </MenuItem>
                     <MenuItem onClick={handleEmptyBucket.bind(this, params)}>
                         <ListItemIcon>
                             <DeleteOutlineIcon fontSize="small" />
                         </ListItemIcon>
-                        <ListItemText>Empty bucket</ListItemText>
+                        <ListItemText>Empty the Bucket</ListItemText>
                     </MenuItem>
                     <MenuItem onClick={handleDeleteBucket.bind(this, params)}>
                         <ListItemIcon>
                             <DeleteIcon fontSize="small" />
                         </ListItemIcon>
-                        <ListItemText>Delete bucket</ListItemText>
+                        <ListItemText>Delete</ListItemText>
                     </MenuItem>
                 </ActionMenu>
             ),
-            headerName: '',
+            headerName: 'Actions',
             align: 'center',
+            headerAlign: 'center',
             width: 150,
         }
     ];
@@ -418,7 +419,7 @@ const BucketsList = () => {
                     <IconButton onClick={handleBackToProfiles}><BackIcon fontSize="small" /></IconButton>
                     <span style={{fontSize: '16px', fontWeight: '700'}}>Buckets</span>
                 </div>
-                <Button onClick={() => setBucketCreateDialog({open: true})} variant="contained" startIcon={<BucketIcon />}>Add bucket</Button>
+                <Button onClick={() => setBucketCreateDialog({open: true})} variant="contained" startIcon={<BucketIcon />}>Create Bucket</Button>
             </Stack>
 
 

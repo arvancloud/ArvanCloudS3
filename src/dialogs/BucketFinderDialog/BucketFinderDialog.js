@@ -87,7 +87,7 @@ function BucketFinderDialog(props) {
 
     return (
         <Dialog open={open} onClose={onClose} fullWidth>
-            <DialogTitle>Select bucket</DialogTitle>
+            <DialogTitle>Pick a Bucket</DialogTitle>
             <DialogContent>
                 {profiles.map((profile) => {
                     return (

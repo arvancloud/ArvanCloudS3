@@ -145,7 +145,7 @@ export default function ObjectUploadBoxDialog (props) {
 
     return (
         <Dialog open={open} fullWidth>
-            <DialogTitle>Upload file in {bucketName} bucket</DialogTitle>
+            <DialogTitle>Uploading to {bucketName}</DialogTitle>
             <DialogContent>
 
                 <Box sx={sx} {...getRootPropsFiles()}>
@@ -154,13 +154,13 @@ export default function ObjectUploadBoxDialog (props) {
                         <Box sx={{fontSize: '24px'}}>Upload files</Box>
                         {
                             isDragActiveFiles ?
-                                <Box sx={{fontSize: '16px', color: 'secondary.main'}}>Drop the files.</Box> :
-                                <Box sx={{fontSize: '16px', color: 'secondary.main'}}>Drag the files here.</Box>
+                                <Box sx={{fontSize: '16px', color: 'secondary.main'}}>Drop your files here.</Box> :
+                                <Box sx={{fontSize: '16px', color: 'secondary.main'}}>Drag your files here.</Box>
 
                         }
                     </div>
                     <Button component="label" variant="contained">
-                        Choose file
+                        Select Files
                         <input onChange={handleSelectFiles} multiple hidden type="file" />
                     </Button>
                 </Box>
@@ -171,13 +171,13 @@ export default function ObjectUploadBoxDialog (props) {
                         <Box sx={{fontSize: '24px'}}>Upload folders</Box>
                         {
                             isDragActiveFolders ?
-                                <Box sx={{fontSize: '16px', color: 'secondary.main'}}>Drop the folders.</Box> :
-                                <Box sx={{fontSize: '16px', color: 'secondary.main'}}>Drag the folders here.</Box>
+                                <Box sx={{fontSize: '16px', color: 'secondary.main'}}>Drop your folders here.</Box> :
+                                <Box sx={{fontSize: '16px', color: 'secondary.main'}}>Drag your folders here.</Box>
 
                         }
                     </div>
                     <Button component="label" variant="contained">
-                        Choose folder
+                        Select a Folder
                         <input webkitdirectory="true" onChange={handleSelectFolders} hidden type="file" />
                     </Button>
                 </Box>

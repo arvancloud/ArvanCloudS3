@@ -46,7 +46,7 @@ export default function BucketCopyDialog (props) {
 
         window.ipcRenderer.on('copyBucket@end', (event) => {
 
-            layout.notify(`${operationName} bucket done`, {
+            layout.notify(`${operationName} done`, {
                 severity: "success"
             });
 
@@ -57,7 +57,7 @@ export default function BucketCopyDialog (props) {
 
         window.ipcRenderer.on('copyBucket@abort', (event) => {
 
-            layout.notify(`${operationName} bucket stopped`, {
+            layout.notify(`${operationName} stopped`, {
                 severity: "warning"
             });
 
@@ -115,7 +115,7 @@ export default function BucketCopyDialog (props) {
 
     return (
         <Dialog open={open} fullWidth>
-            <DialogTitle>{operationName} files of a bucket</DialogTitle>
+            <DialogTitle>{operationName} the bucket</DialogTitle>
             {
                 open &&
                 <DialogContent>
@@ -144,7 +144,7 @@ export default function BucketCopyDialog (props) {
             }
             <DialogActions>
                 <Button color="secondary" variant="outlined" disabled={isFinish} onClick={handleCancelOperation}>{processing ? "Stop" : "Cancel"}</Button>
-                <Button variant="contained"  disabled={processing} onClick={handleCopyBucket}>{isFinish ? "End" : (isSync ? "Sync" : "Copy")}</Button>
+                <Button variant="contained"  disabled={processing} onClick={handleCopyBucket}>{isFinish ? "Done" : (isSync ? "Sync" : "Copy")}</Button>
             </DialogActions>
         </Dialog>
     );

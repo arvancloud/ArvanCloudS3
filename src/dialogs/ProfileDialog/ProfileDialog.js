@@ -74,13 +74,14 @@ function ProfileDialog(props) {
 
     return (
         <Dialog open={open} onClose={onClose}>
-            <DialogTitle>{profile.id ? 'Edit' : 'Add'} profile</DialogTitle>
+            {/* <DialogTitle>{profile.id ? 'Edit' : 'Add'} profile</DialogTitle> */}
+            <DialogTitle>Setup</DialogTitle>
             <DialogContent>
                 <TextField
                     autoFocus
                     size="small"
                     id="profile-title"
-                    label="Title"
+                    label="Name"
                     type="text"
                     fullWidth
                     name="title"
@@ -90,7 +91,7 @@ function ProfileDialog(props) {
                 <TextField
                     size="small"
                     id="profile-provider"
-                    label="Provider"
+                    label="Account Type"
                     select
                     fullWidth
                     name="provider"
@@ -133,7 +134,7 @@ function ProfileDialog(props) {
                     size="small"
                     error={!!validationError.access_key}
                     id="profile-access-key"
-                    label="Access Key"
+                    label="Access Key ID"
                     type="text"
                     fullWidth
                     name="access_key"
@@ -145,7 +146,7 @@ function ProfileDialog(props) {
                     error={!!validationError.secret_key}
                     size="small"
                     id="profile-secret-key"
-                    label="Secret Key"
+                    label="Secret Access Key"
                     type="text"
                     fullWidth
                     name="secret_key"
@@ -165,7 +166,7 @@ function ProfileDialog(props) {
                         (!inputField.endpoint_url && inputField.provider === "other")
                     }
                     onClick={handleSaveProfile}
-                >Save</Button>
+                >Add</Button>
             </DialogActions>
         </Dialog>
     );

@@ -14,7 +14,11 @@ class BucketsChannel extends Channel {
 
         let buckets = await Promise.all(response.Buckets.map(async (bucket) => {
 
-            bucket.IsPublic = await S3Helper.isPublicBucket(s3, bucket.Name);
+            try {
+                bucket.IsPublic = await S3Helper.isPublicBucket(s3, bucket.Name);
+            } catch (e) {
+                bucket.IsPublic = null;
+            }
 
             return bucket;
 
