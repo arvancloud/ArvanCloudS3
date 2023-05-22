@@ -102,7 +102,7 @@ const ProfilesList = () => {
             title: "Delete profile",
             content: (
                 <span>
-                    Are you sure you want to delete {profile.title}'s profile?
+                    Are you sure you want to delete the profile {profile.title}?
                 </span>
             ),
             onConfirm: async () => {
@@ -166,7 +166,7 @@ const ProfilesList = () => {
         },
         {
             field: 'title',
-            headerName: 'Title',
+            headerName: 'Name',
             renderCell: (params) => {
 
                 return (
@@ -192,30 +192,31 @@ const ProfilesList = () => {
                         <ListItemIcon>
                             <EditIcon fontSize="small" />
                         </ListItemIcon>
-                        <ListItemText>Edit profile</ListItemText>
+                        <ListItemText>Manage Profile</ListItemText>
                     </MenuItem>
                     <MenuItem disableRipple onClick={handleDeleteProfile.bind(this, params.row)}>
                         <ListItemIcon>
                             <DeleteIcon fontSize="small" />
                         </ListItemIcon>
-                        <ListItemText>Delete profile</ListItemText>
+                        <ListItemText>Delete Profile</ListItemText>
                     </MenuItem>
                 </ActionMenu>
             ),
-            headerName: '',
+            headerName: 'Actions',
             align: 'center',
-            width: 150,
+            headerAlign: 'center',
+            width: 160,
         }
     ];
 
     const ToolBar = (
         <div>
-            <h3 style={{marginTop: '0'}}>Arvan Cloud S3</h3>
+            <h3 style={{marginTop: '0'}}>ArvanCloudS3</h3>
             <Stack direction="row" justifyContent="space-between" sx={{marginBottom: '1rem'}}>
                 <div>
-                    <span style={{fontSize: '16px', fontWeight: '700'}}>Profiles</span>
+                    <span style={{fontSize: '16px', fontWeight: '700'}}>Profile</span>
                 </div>
-                <Button onClick={handleNewProfile} variant="contained" startIcon={<CloudIcon />}>Add profile</Button>
+                <Button onClick={handleNewProfile} variant="contained" startIcon={<CloudIcon />}>Add Profile</Button>
             </Stack>
 
             <ProfileDialog

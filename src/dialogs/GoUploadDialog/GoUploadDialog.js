@@ -51,7 +51,7 @@ export default function GoUploadDialog (props) {
 
         window.ipcRenderer.on('uploadFiles@end', (event) => {
 
-            layout.notify("The files have been uploaded successfully", {
+            layout.notify("Upload Successful!", {
                 severity: "success"
             });
 
@@ -130,17 +130,17 @@ export default function GoUploadDialog (props) {
 
     return (
         <Dialog open={open} fullWidth>
-            <DialogTitle>Upload file in {bucketName} bucket</DialogTitle>
+            <DialogTitle>Upload to {bucketName}</DialogTitle>
             {
                 open &&
                 <DialogContent>
                     <Stack spacing={3} style={{fontSize: '14px'}}>
                         <Stack direction="row" spacing={2} justifyContent="space-between" alignItems="center">
-                            <span>Number of files</span>
+                            <span>Files</span>
                             <span>{ objectsData.count }</span>
                         </Stack>
                         <Stack direction="row" spacing={2} justifyContent="space-between" alignItems="center">
-                            <span>Public read access</span>
+                            <span>Public Access</span>
                             <Switch
                                 id="objects-acl"
                                 name="ACL"
@@ -165,7 +165,7 @@ export default function GoUploadDialog (props) {
             }
             <DialogActions>
                 <Button color="secondary" variant="outlined" disabled={finish} onClick={handleCancelOperation}>{processing ? "Stop" : "Cancel"}</Button>
-                <Button variant="contained" disabled={processing} onClick={handleUploadObjects}>{finish ? "End" : "Upload"}</Button>
+                <Button variant="contained" disabled={processing} onClick={handleUploadObjects}>{finish ? "Done" : "Upload"}</Button>
             </DialogActions>
         </Dialog>
     );

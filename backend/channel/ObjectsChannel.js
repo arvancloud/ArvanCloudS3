@@ -173,7 +173,7 @@ class ObjectsChannel extends Channel {
     async downloadObjects(profile, bucketName, objectKeys) {
 
         let downloadPath = dialog.showOpenDialogSync(this.mainWindow ,{
-            title: "Select folder for download",
+            title: "Select your download destination",
             defaultPath: "",
             buttonLabel: "Select Folder",
             properties: [

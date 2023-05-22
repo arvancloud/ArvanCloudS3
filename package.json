@@ -39,7 +39,7 @@
     "react-start": "react-scripts start",
     "react-build": "react-scripts build",
     "react-test": "react-scripts test --env=jsdom",
-    "start": "set DEV_MODE=true && electron ."
+    "start": "DEV_MODE=true electron ."
   },
   "eslintConfig": {
     "extends": [
