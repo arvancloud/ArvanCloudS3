@@ -7,6 +7,7 @@ import Button from "@mui/material/Button";
 import MenuItem from "@mui/material/MenuItem";
 import LayoutContext from "../../contexts/LayoutContext";
 import TextField from "../../components/TextField/TextField";
+import { Alert, Link } from '@mui/material';
 
 function ProfileDialog(props) {
 
@@ -76,6 +77,9 @@ function ProfileDialog(props) {
         <Dialog open={open} onClose={onClose}>
             {/* <DialogTitle>{profile.id ? 'Edit' : 'Add'} profile</DialogTitle> */}
             <DialogTitle>Setup</DialogTitle>
+            <Alert severity="info">
+                If you're not sure about your credentials please visit <Link href="https://panel.arvancloud.ir/storage/access-management" target="_blank" underline="hover">Access Management</Link>.
+            </Alert>
             <DialogContent>
                 <TextField
                     autoFocus
@@ -118,15 +122,15 @@ function ProfileDialog(props) {
                         <TextField
                             size="small"
                             id="profile-endpoint-url"
-                            label="Endpoint URL"
+                            label="Region"
                             select
                             fullWidth
                             name="endpoint_url"
                             value={inputField.endpoint_url}
                             onChange={handleInputs}
                         >
-                            <MenuItem value="https://s3.ir-thr-at1.arvanstorage.ir">s3.ir-thr-at1.arvanstorage.ir</MenuItem>
-                            <MenuItem value="https://s3.ir-tbz-sh1.arvanstorage.ir">s3.ir-tbz-sh1.arvanstorage.ir</MenuItem>
+                            <MenuItem value="https://s3.ir-thr-at1.arvanstorage.ir">Simin (s3.ir-thr-at1.arvanstorage.ir)</MenuItem>
+                            <MenuItem value="https://s3.ir-tbz-sh1.arvanstorage.ir">Shariar (s3.ir-tbz-sh1.arvanstorage.ir)</MenuItem>
                         </TextField>
                 }
 

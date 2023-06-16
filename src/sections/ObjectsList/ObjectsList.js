@@ -37,7 +37,7 @@ const ObjectsList = () => {
     const directoryMode = location.state.directoryMode;
 
     const [rowCount, setRowCount] = React.useState(0);
-    const [pageSize, setPageSize] = React.useState(5);
+    const [pageSize, setPageSize] = React.useState(25);
     const [page, setPage] = React.useState(0);
     const [loading, setLoading] = React.useState(false);
     const [objects, setObjects] = React.useState(null);

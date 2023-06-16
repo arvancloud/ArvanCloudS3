@@ -30,7 +30,7 @@ const BucketsList = () => {
 
     const mountedProfile = location.state.mountedProfile;
 
-    const [pageSize, setPageSize] = React.useState(5);
+    const [pageSize, setPageSize] = React.useState(25);
     const [buckets, setBuckets] = React.useState([]);
     const [bucketCreateDialog, setBucketCreateDialog] = React.useState({open: false});
     const [bucketCopyDialog, setBucketCopyDialog] = React.useState({open: false, source: {}, dest: {}, isSync: false});
@@ -316,7 +316,7 @@ const BucketsList = () => {
             renderCell: (params) => {
 
                 return (
-                    <span className="row-index mouse-pointer" onClick={handleShowObjects.bind(this, params.id)}>{params.api.getRowIndex(params.row.id) + 1}</span>
+                    <span className="row-index" onClick={handleShowObjects.bind(this, params.id)}>{params.api.getRowIndex(params.row.id) + 1}</span>
                 )
             },
             width: 50,
@@ -327,7 +327,7 @@ const BucketsList = () => {
             renderCell: (params) => {
 
                 return (
-                    <span className="mouse-pointer" onClick={handleShowDirectories.bind(this, params.id)}>{params.row.Name}</span>
+                    <span onClick={handleShowDirectories.bind(this, params.id)}>{params.row.Name}</span>
                 )
             },
             //maxWidth: 400,
@@ -437,6 +437,8 @@ const BucketsList = () => {
         </div>
     );
 
+    const showObjectsFn = (params) => handleShowObjects.bind(this, params.id)();
+
     return (
         <div style={{}}>
 
@@ -450,6 +452,8 @@ const BucketsList = () => {
                     columns={columns}
                     loading={loading}
                     rows={buckets}
+                    onRowClick={showObjectsFn}
+                    getRowClassName={() => "mouse-pointer"}
                 />
             }
         </div>

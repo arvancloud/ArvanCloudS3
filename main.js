@@ -8,7 +8,7 @@ global.GlobalData = {
 };
 global.Store = Router.resolve("core/Store");
 
-const {BrowserWindow , app, ipcMain, dialog} = require('electron') // app : control application life.
+const {BrowserWindow , app, ipcMain, dialog, shell} = require('electron') // app : control application life.
 const cors = require('cors')
 //const Sequelize = require('sequelize')
 const find = require('find-process');
@@ -91,6 +91,11 @@ function CreateWindow() {
             contextIsolation: false,
             preload: path.join(__dirname, 'preload.js')
         }
+    });
+
+    mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+        shell.openExternal(url);
+        return { action: 'deny' };
     });
 
     //mainWindow.maximize();
