@@ -159,7 +159,7 @@ const ProfilesList = () => {
             renderCell: (params) => {
 
                 return (
-                    <span className="row-index mouse-pointer" onClick={handleShowBuckets.bind(this, params.row)}>{params.api.getRowIndex(params.row.id) + 1}</span>
+                    <span className="row-index" onClick={handleShowBuckets.bind(this, params.row)}>{params.api.getRowIndex(params.row.id) + 1}</span>
                 )
             },
             width: 50,
@@ -170,7 +170,7 @@ const ProfilesList = () => {
             renderCell: (params) => {
 
                 return (
-                    <span className="mouse-pointer" onClick={handleShowBuckets.bind(this, params.row)}>{params.row.title}</span>
+                    <span onClick={handleShowBuckets.bind(this, params.row)}>{params.row.title}</span>
                 )
             },
             width: 250
@@ -228,6 +228,7 @@ const ProfilesList = () => {
         </div>
     );
 
+    const showBucketsFn = (params) => handleShowBuckets.bind(this, params.row)()
 
     return (
         <div style={{}}>
@@ -241,6 +242,8 @@ const ProfilesList = () => {
                 onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
                 columns={columns}
                 rows={profiles}
+                onRowClick={showBucketsFn}
+                getRowClassName={() => "mouse-pointer"}
             />
             }
         </div>
